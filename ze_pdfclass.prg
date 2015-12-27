@@ -278,5 +278,3 @@ METHOD MaxRowTest( nRows ) CLASS PDFClass
 FUNCTION TxtSaida()
    RETURN { "PDF Landscape", "PDF Portrait", "Matrix" }
 
-FUNCTION MyTempFile( cExtensao )
-   RETURN "temp." + cExtensao

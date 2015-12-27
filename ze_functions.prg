@@ -128,6 +128,7 @@ FUNCTION PicVal( nLen, nDec )
    RETURN cPicture
 
 FUNCTION SayScroll( cText )
+   cText := iif( cText == NIL, "", cText )
    Scroll( 2, 0, MaxRow() - 3, MaxCol(), 1 )
    @ MaxRow() - 3, 0 SAY cText
    RETURN NIL
@@ -148,3 +149,47 @@ FUNCTION MsgStop( cText )
 
 FUNCTION ReturnValue( xValue, ... )
    RETURN xValue
+
+FUNCTION RecLock()
+
+   RLock()
+   RETURN .T.
+
+FUNCTION RecUnlock()
+
+   UNLOCK
+   RETURN NIL
+
+FUNCTION RunCmd( cComando )
+
+   RUN ( cComando )
+   RETURN NIL
+
+FUNCTION Cls()
+
+   Scroll( 1, 0, MaxRow() - 3, MaxCol(), 0 )
+   RETURN NIL
+
+FUNCTION GravaOcorrencia( ... )
+
+   RETURN NIL
+
+FUNCTION RecDelete()
+
+   RecLock()
+   DELETE
+   RecUnlock()
+   RETURN NIL
+
+FUNCTION MyTempFile( cExtensao )
+   RETURN "temp." + cExtensao
+
+FUNCTION MacroType( cExpression )
+
+   LOCAL cType := "U", bBlock
+
+   BEGIN SEQUENCE WITH { | e | Break( e ) }
+      bBlock := hb_MacroBlock( cExpression )
+      cType  := ValType( Eval( bBlock ) )
+   END SEQUENCE
+   RETURN cType

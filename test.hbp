@@ -7,6 +7,7 @@ menu.prg
 modalwindow.prg
 pdf.prg
 progressbar.prg
+rdbase.prg
 sped.prg
 ze_frmclass.prg
 ze_frmcadclass.prg
@@ -18,10 +19,13 @@ ze_xmlfun.prg
 test.rc
 hbhpdf.hbc
 hbct.hbc
+gtwvg.hbc
+xhb.hbc
 -w3
 -es2
 -mt
 -strip
 -compr
-gtwvg.hbc
+-inc
 -DGTWVG
+-workdir=c:\temp

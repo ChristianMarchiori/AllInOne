@@ -1,5 +1,4 @@
 FUNCTION ModalWindow()
-#ifdef GTWVG
    LOCAL oCrt, nSel
 
    oCrt := WvgCrt():New( /* parent */, /* owner */, { 4, 8 }, { 12, 49 }, , .T. )
@@ -20,5 +19,4 @@ FUNCTION ModalWindow()
       ENDIF
    ENDDO
    oCrt:Destroy()
-#endif
    RETURN NIL

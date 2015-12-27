@@ -1,7 +1,6 @@
 #include "inkey.ch"
 #include "hbgtinfo.ch"
 
-#ifdef GTWVG
 FUNCTION TwoCalendar()
    LOCAL oButtons := {}, nRow, nCol, dDate, oElement
 
@@ -81,4 +80,3 @@ FUNCTION MyButton( nRowIni, nColIni, nWidth, nHeight, cCaption )
    oThisButton:Caption := cCaption
    oThisButton:Create( , , { -nRowIni, -nColIni }, { -nWidth, -nHeight } )
    RETURN oThisButton
-#endif
