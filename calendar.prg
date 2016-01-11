@@ -2,6 +2,7 @@
 #include "hbgtinfo.ch"
 
 FUNCTION TwoCalendar()
+
    LOCAL oButtons := {}, nRow, nCol, dDate, oElement
 
    hb_gtReload( hb_GTInfo( HB_GTI_VERSION ) )
@@ -23,6 +24,7 @@ FUNCTION TwoCalendar()
    RETURN NIL
 
 FUNCTION Calendar( nRow, nCol, dDate, oButtons )
+
    LOCAL oThisButton, nRowCont, nColCont, nDay, nLastDay, nCont
 
    nRow := iif( nRow == NIL, 3, nRow )
@@ -67,6 +69,7 @@ FUNCTION Calendar( nRow, nCol, dDate, oButtons )
    RETURN NIL
 
 FUNCTION LastDateMonth( dDate )
+
    LOCAL dNewDate
 
    dNewDate := dDate - Day( dDate ) + 35
@@ -74,7 +77,9 @@ FUNCTION LastDateMonth( dDate )
    RETURN dNewDate
 
 FUNCTION MyButton( nRowIni, nColIni, nWidth, nHeight, cCaption )
+
    LOCAL oThisButton
+
    oThisButton := wvgPushButton():New()
    oThisButton:PointerFocus := .F.
    oThisButton:Caption := cCaption

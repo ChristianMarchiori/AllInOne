@@ -1,7 +1,9 @@
 #include "hbgtinfo.ch"
 
 FUNCTION About()
+
    LOCAL cText := ""
+
    HarbourInit()
    cText += Version() + HB_EOL()
    cText += HB_Compiler() + HB_EOL()

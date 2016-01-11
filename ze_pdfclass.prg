@@ -10,6 +10,7 @@
 #define PDF_TXT       3
 
 CREATE CLASS PDFClass
+
    VAR    oPdf
    VAR    oPage
    VAR    cFileName         INIT ""
@@ -45,6 +46,7 @@ CREATE CLASS PDFClass
    ENDCLASS
 
 METHOD Begin() CLASS PDFClass
+
    IF ::nType > 2
       IF Empty( ::cFileName )
          ::cFileName := MyTempFile( "LST" )
@@ -64,6 +66,7 @@ METHOD Begin() CLASS PDFClass
    RETURN NIL
 
 METHOD End() CLASS PDFClass
+
    IF ::nType > 2
       SET DEVICE TO SCREEN
       SET PRINTER TO
@@ -83,6 +86,7 @@ METHOD End() CLASS PDFClass
    RETURN NIL
 
 METHOD SetInfo( cAuthor, cCreator, cTitle, cSubject ) CLASS PDFClass
+
    IF ::nType > 2
       RETURN NIL
    ENDIF
@@ -98,6 +102,7 @@ METHOD SetInfo( cAuthor, cCreator, cTitle, cSubject ) CLASS PDFClass
    RETURN NIL
 
 METHOD SetType( nType ) CLASS PDFClass
+
    IF nType != NIL
       ::nType := nType
    ENDIF
@@ -105,6 +110,7 @@ METHOD SetType( nType ) CLASS PDFClass
    RETURN NIL
 
 METHOD AddPage() CLASS PDFClass
+
    IF ::nType < 3
       ::oPage := HPDF_AddPage( ::oPdf )
       HPDF_Page_SetSize( ::oPage, HPDF_PAGE_SIZE_A4, iif( ::nType == 2, HPDF_PAGE_PORTRAIT, HPDF_PAGE_LANDSCAPE ) )
@@ -114,13 +120,16 @@ METHOD AddPage() CLASS PDFClass
    RETURN NIL
 
 METHOD Cancel() CLASS PDFClass
+
    IF ::nType < 3
       HPDF_Free( ::oPdf )
    ENDIF
    RETURN NIL
 
 METHOD DrawText( nRow, nCol, xValue, cPicture, nFontSize, cFontName, nAngle, anRGB ) CLASS PDFClass
+
    LOCAL nRadian , cTexto
+
    nFontSize := iif( nFontSize == NIL, ::nFontSize, nFontSize )
    cFontName := iif( cFontName == NIL, ::cFontName, cFontName )
    cPicture  := iif( cPicture == NIL, "", cPicture )
@@ -150,6 +159,7 @@ METHOD DrawText( nRow, nCol, xValue, cPicture, nFontSize, cFontName, nAngle, anR
    RETURN NIL
 
 METHOD DrawLine( nRowi, nColi, nRowf, nColf, nPenSize ) CLASS PDFClass
+
    IF ::nType > 2
       nRowi := Round( nRowi, 0 )
       nColi := Round( nColi, 0 )
@@ -169,7 +179,9 @@ METHOD DrawLine( nRowi, nColi, nRowf, nColf, nPenSize ) CLASS PDFClass
    RETURN NIL
 
 METHOD DrawImage( cJPEGFile, nRow, nCol, nWidth, nHeight ) CLASS PDFClass
+
    LOCAL oImage
+
    IF ::nType > 2
       RETURN NIL
    ENDIF
@@ -182,6 +194,7 @@ METHOD DrawImage( cJPEGFile, nRow, nCol, nWidth, nHeight ) CLASS PDFClass
    RETURN NIL
 
 METHOD DrawRetangle( nTop, nLeft, nWidth, nHeight, nPenSize, nFillType, anRGB ) CLASS PDFClass
+
    IF ::nType > 2
       RETURN NIL
    ENDIF
@@ -211,13 +224,17 @@ METHOD DrawRetangle( nTop, nLeft, nWidth, nHeight, nPenSize, nFillType, anRGB ) 
    RETURN NIL
 
 METHOD RowToPDFRow( nRow ) CLASS PDFClass
+
    RETURN HPDF_Page_GetHeight( ::oPage ) - ::nMargin - ( nRow * ::nFontSize * ::nLineHeight )
 
 METHOD ColToPDFCol( nCol ) CLASS PDFClass
+
    RETURN nCol * ::nFontSize / 1.666 + ::nMargin
 
 METHOD MaxRow() CLASS PDFClass
+
    LOCAL nPageHeight, nMaxRow
+
    IF ::nType > 2
       RETURN 63
    ENDIF
@@ -226,7 +243,9 @@ METHOD MaxRow() CLASS PDFClass
    RETURN nMaxRow
 
 METHOD MaxCol() CLASS PDFClass
+
    LOCAL nPageWidth, nMaxCol
+
    IF ::nType > 2
       RETURN 132
    ENDIF
@@ -235,7 +254,9 @@ METHOD MaxCol() CLASS PDFClass
    RETURN nMaxCol
 
 METHOD PrnToPdf( cInputFile ) CLASS PDFClass
+
    LOCAL cTxtReport, cTxtPage, cTxtLine, nRow
+
    cTxtReport := MemoRead( cInputFile ) + Chr(12)
    TokenInit( @cTxtReport, Chr(12) )
    DO WHILE .NOT. TokenEnd()
@@ -256,6 +277,7 @@ METHOD PrnToPdf( cInputFile ) CLASS PDFClass
    RETURN NIL
 
 METHOD PageHeader() CLASS PDFClass
+
    ::nPdfPage    += 1
    ::nPageNumber += 1
    ::nRow        := 0
@@ -269,6 +291,7 @@ METHOD PageHeader() CLASS PDFClass
    RETURN NIL
 
 METHOD MaxRowTest( nRows ) CLASS PDFClass
+
    nRows := iif( nRows == NIL, 0, nRows )
    IF ::nRow > ::MaxRow() - 2 - nRows
       ::PageHeader()
@@ -276,5 +299,6 @@ METHOD MaxRowTest( nRows ) CLASS PDFClass
    RETURN NIL
 
 FUNCTION TxtSaida()
+
    RETURN { "PDF Landscape", "PDF Portrait", "Matrix" }
 

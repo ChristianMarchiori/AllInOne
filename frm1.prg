@@ -6,6 +6,7 @@
 #include "hbgtinfo.ch"
 
 FUNCTION Frm1( lIsGraphic, lThread )
+
    LOCAL oFrm := frm1Class():New()
 
    lIsGraphic := iif( lIsGraphic == NIL, hb_gtInfo( HB_GTI_VERSION ) == "WVG", lIsGraphic )
@@ -26,11 +27,13 @@ FUNCTION Frm1( lIsGraphic, lThread )
    RETURN NIL
 
 CREATE CLASS frm1Class INHERIT frmCadClass
+
    METHOD DataEntry( lEdit )
    METHOD UserFunction()
    END CLASS
 
 METHOD DataEntry( lEdit ) CLASS frm1Class
+
    LOCAL GetList := {}
    LOCAL cCode  := mydbf->Code
    LOCAL cName  := mydbf->Name
@@ -63,6 +66,7 @@ METHOD DataEntry( lEdit ) CLASS frm1Class
    RETURN NIL
 
 METHOD UserFunction() CLASS frm1Class
+
    DO CASE
    CASE ::cOption == "B"
 #ifdef GTWVG
@@ -76,6 +80,7 @@ METHOD UserFunction() CLASS frm1Class
    RETURN NIL
 
 STATIC FUNCTION CreateDbf()
+
    LOCAL aStru, nCont
 
    IF .NOT. File( "mydbf.dbf" )

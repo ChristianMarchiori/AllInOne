@@ -13,6 +13,7 @@ REQUEST __keyboard
 #define OPTION_EXIT     "X"
 
 CREATE CLASS frmClass
+
    VAR    cOption        INIT " "
    VAR    cOptions       INIT OPTION_INSERT + OPTION_EDIT + OPTION_DELETE
    VAR    acButtons      INIT {}
@@ -38,12 +39,14 @@ CREATE CLASS frmClass
    END CLASS
 
 METHOD Init() CLASS frmClass
+
    SET SCOREBOARD OFF
    SET( _SET_EVENTMASK, INKEY_ALL - INKEY_MOVE )
    SetColor( "0/7,0/15,,,0/15" )
    RETURN NIL
 
 METHOD FormBegin() CLASS frmClass
+
    ::OptionCreate()
    RETURN NIL
 
@@ -54,6 +57,7 @@ METHOD FormEnd() CLASS frmClass
    RETURN NIL
 
 METHOD OptionCreate() CLASS frmClass
+
    LOCAL nCont
 
    ::acButtons := {}
@@ -81,7 +85,8 @@ METHOD OptionCreate() CLASS frmClass
 #endif
    RETURN NIL
 
-METHOD OptionSelect()
+METHOD OptionSelect() CLASS frmClass
+
    LOCAL nCont, nOpc := 0, oButton
 
 #ifdef GTWVG
@@ -108,7 +113,7 @@ METHOD OptionSelect()
    ENDIF
    RETURN NIL
 
-METHOD RowIni()
+METHOD RowIni() CLASS frmClass
 #ifdef GTWVG
    IF ::lIsGraphic
       @ 5, 1 SAY ""
@@ -121,8 +126,10 @@ METHOD RowIni()
    RETURN NIL
 
 #ifdef GTWVG
-   METHOD GUICreate()
+   METHOD GUICreate() CLASS frmClass
+
       LOCAL nCol, oThisButton, cToolTip, cColorAnt, oButton
+
       cColorAnt := SetColor( "7/0" )
       @ 0, 0 CLEAR TO 4, MaxCol()
       SetColor( cColorAnt )
@@ -140,8 +147,10 @@ METHOD RowIni()
       ::GuiShow()
       RETURN NIL
 
-   METHOD GUISelect()
+   METHOD GUISelect() CLASS frmClass
+
       LOCAL nKey
+
       ::GuiEnable()
       nKey := Inkey(0)
       ::cOption := Chr( nKey )
@@ -151,22 +160,28 @@ METHOD RowIni()
       ENDIF
       RETURN NIL
 
-   METHOD GUIEnable()
+   METHOD GUIEnable() CLASS frmClass
+
       LOCAL oButton
+
       FOR EACH oButton IN ::aGUIButtons
          oButton:Enable()
       NEXT
       RETURN NIL
 
-   METHOD GUIDisable()
+   METHOD GUIDisable() Class frmClass
+
       LOCAL oButton
+
       FOR EACH oButton IN ::aGUIButtons
          oButton:Disable()
       NEXT
       RETURN NIL
 
-   METHOD GUIHide()
+   METHOD GUIHide() Class frmClass
+
       LOCAL oButton
+
       FOR EACH oButton IN ::aGUIButtons
          oButton:Hide()
       NEXT
@@ -174,16 +189,20 @@ METHOD RowIni()
       SetPaintBlock( {} )
       RETURN NIL
 
-    METHOD GuiShow()
+    METHOD GuiShow() Class frmClass
+
       LOCAL oButton
+
       FOR EACH oButton IN ::aGUIButtons
          oButton:Show()
       NEXT
       SetPaintBlock( ::oSaveBoxGet )
       RETURN NIL
 
-   METHOD GUIDestroy()
+   METHOD GUIDestroy() Class frmClass
+
       LOCAL oButton
+
       FOR EACH oButton IN ::aGUIButtons
          oButton:Destroy()
       NEXT
@@ -191,7 +210,9 @@ METHOD RowIni()
       RETURN NIL
 
    STATIC FUNCTION IconFromCaption( cCaption, cToolTip )
+
       LOCAL xSource
+
       cToolTip := ""
       DO CASE
       CASE cCaption == "Edit";       xSource := "cmdEdit";     cToolTip := "Edit Current Record"
@@ -210,12 +231,15 @@ METHOD RowIni()
       RETURN xSource
 
 FUNCTION wvt_Paint()
+
    wvtPaintObjects()
    RETURN NIL
 
 FUNCTION SetPaintBlock( oNewBlock )
+
    LOCAL oOldBlock
    THREAD STATIC oBlock := {}
+
    oOldBlock := oBlock
    IF oNewBlock != NIL
       oBlock := oNewBlock
@@ -224,11 +248,25 @@ FUNCTION SetPaintBlock( oNewBlock )
    RETURN oOldBlock
 
 FUNCTION SetPaintGetList( GetList )
+
    LOCAL oPos := {} , oGet
+
    FOR EACH oGet IN GetList
       Aadd( oPos, { oGet:Row, oGet:Col, oGet:Row, oGet:Col - 1 + Len( Transform( oGet:VarGet(), oGet:Picture ) ) } )
    NEXT
-   SetPaintBlock( { { "Gets", {|| AEval( oPos, {| oPosi | Wvt_DrawBoxGroup( oPosi[1], oPosi[2], oPosi[3], oPosi[4] ) } ) }, NIL } } )
+   SetPaintBlock( { { "Gets", {|| AEval( oPos, {| oPosi | DrawBoxGetFlat( oPosi ) } ) }, NIL } } )
    wvgSetAppWindow():Refresh()
    RETURN NIL
+
+
+STATIC FUNCTION DrawBoxGetFlat( oPos )
+
+   LOCAL nColor := WIN_RGB( 100, 100, 100 )
+
+   wvt_DrawLine( oPos[1], oPos[2], oPos[1], oPos[4], WVT_LINE_HORZ, WVT_LINE_PLAIN, WVT_LINE_TOP, WVT_LINE_SOLID, 1, nColor )
+   wvt_DrawLine( oPos[1], oPos[2], oPos[1], oPos[2], WVT_LINE_VERT, WVT_LINE_PLAIN, WVT_LINE_LEFT, WVT_LINE_SOLID, 1, nColor )
+   wvt_DrawLine( oPos[1], oPos[2], oPos[1], oPos[4], WVT_LINE_HORZ, WVT_LINE_PLAIN, WVT_LINE_BOTTOM, WVT_LINE_SOLID, 1, nColor )
+   wvt_DrawLine( oPos[3], oPos[4], oPos[3], oPos[4], WVT_LINE_VERT, WVT_LINE_PLAIN, WVT_LINE_RIGHT, WVT_LINE_SOLID, 1, nColor )
+   RETURN NIL
 #endif
+

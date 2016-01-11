@@ -36,6 +36,7 @@
 #define WSPRODUCAO      "1"
 
 CREATE CLASS SefazClass
+
    VAR    cAmbiente     INIT WSPRODUCAO
    VAR    cScan         INIT "N"
    VAR    cUF           INIT "SP"
@@ -67,6 +68,7 @@ CREATE CLASS SefazClass
    ENDCLASS
 
 METHOD CteConsulta( cChave, cCertificado ) CLASS SefazClass
+
    ::cCertificado:= cCertificado
    ::cVersao     := "1.04"
    ::cUf         := Substr( cChave, 1, 2 )
@@ -83,6 +85,7 @@ METHOD CteConsulta( cChave, cCertificado ) CLASS SefazClass
    RETURN ::cXmlRetorno
 
 METHOD CteLoteEnvia( cXml, cLote, cUf, cCertificado ) CLASS SefazClass
+
    ::cCertificado := cCertificado
    ::cUf          := UfCodigo( cUf )
    ::cVersao      := "1.00"
@@ -99,6 +102,7 @@ METHOD CteLoteEnvia( cXml, cLote, cUf, cCertificado ) CLASS SefazClass
    RETURN ::cXmlRetorno
 
 METHOD CteStatus( cUf, cCertificado ) CLASS SefazClass
+
    ::cCertificado := cCertificado
    ::cVersao      := "1.04"
    ::cUf          := UfCodigo( cUf )
@@ -117,6 +121,7 @@ METHOD CteStatus( cUf, cCertificado ) CLASS SefazClass
 
 
 METHOD MdfeConsulta( cChave, cCertificado ) CLASS SefazClass
+
    ::cCertificado := cCertificado
    ::cVersao     := "1.00"
    ::cUf         := Substr( cChave, 1, 2 )
@@ -137,6 +142,7 @@ METHOD MdfeConsulta( cChave, cCertificado ) CLASS SefazClass
 
 
 METHOD NfeCancela( cUf, cXml, cCertificado ) CLASS SefazClass
+
    ::cCertificado := cCertificado
    ::cVersao      := "2.00"
    ::cUf          := UfCodigo( cUf )
@@ -148,6 +154,7 @@ METHOD NfeCancela( cUf, cXml, cCertificado ) CLASS SefazClass
    RETURN ::cXmlRetorno
 
 METHOD NfeCadastro( cUf, cCnpj, cCertificado ) CLASS SefazClass
+
    ::cCertificado := cCertificado
    ::cVersao      := "2.00"
    ::cUf          := UfCodigo( cUf )
@@ -172,6 +179,7 @@ METHOD NfeCadastro( cUf, cCnpj, cCertificado ) CLASS SefazClass
    RETURN ::cXmlRetorno
 
 METHOD NfeConsulta( cChave, cCertificado ) CLASS SefazClass
+
    ::cCertificado:= cCertificado
    ::cVersao     := "2.01"
    ::cUf         := Substr( cChave, 1, 2 )
@@ -188,6 +196,7 @@ METHOD NfeConsulta( cChave, cCertificado ) CLASS SefazClass
    RETURN ::cXmlRetorno
 
 METHOD NfeEventoEnvia( cChave, cXml, cCertificado ) CLASS SefazClass
+
    ::cCertificado := cCertificado
    ::cVersao      := "1.00"
    ::cUf          := Substr( cChave, 1, 2 )
@@ -203,6 +212,7 @@ METHOD NfeEventoEnvia( cChave, cXml, cCertificado ) CLASS SefazClass
    RETURN ::cXmlRetorno
 
 METHOD NfeLoteEnvia( cXml, cLote, cUf, cCertificado ) CLASS SefazClass
+
    ::cCertificado := cCertificado
    ::cXmlDados    := ""
    ::cUf          := UfCodigo( cUf )
@@ -220,6 +230,7 @@ METHOD NfeLoteEnvia( cXml, cLote, cUf, cCertificado ) CLASS SefazClass
    RETURN ::cXmlRetorno
 
 METHOD NfeConsultaRecibo( cRecibo, cUf, cCertificado ) CLASS SefazClass
+
    ::cCertificado := cCertificado
    ::cVersao      := "2.00"
    ::cUf          := UfCodigo( cUf )
@@ -235,6 +246,7 @@ METHOD NfeConsultaRecibo( cRecibo, cUf, cCertificado ) CLASS SefazClass
    RETURN ::cXmlRetorno
 
 METHOD NfeStatus( cUf, cCertificado ) CLASS SefazClass
+
    ::cCertificado := cCertificado
    ::cVersao      := "2.00"
    ::cUf          := UfCodigo( cUf )
@@ -251,7 +263,9 @@ METHOD NfeStatus( cUf, cCertificado ) CLASS SefazClass
    RETURN ::cXmlRetorno
 
 METHOD TipoXml( cXml ) CLASS SefazClass
+
    LOCAL aTipos, cTipoXml, nCont, cTipoEvento
+
    aTipos := { ;
       { [<infMDFe],   [MDFE] }, ; // primeiro, pois tem nfe e cte
       { [<infCte],    [CTE]  }, ;   // segundo, pois tem nfe
@@ -283,7 +297,9 @@ METHOD TipoXml( cXml ) CLASS SefazClass
    RETURN cTipoXml
 
 METHOD GetWebService( cUf, cServico ) CLASS SefazClass
+
    LOCAL cTexto
+
    // SVAN: ES,MA,PA,PI,RN
    // SVRS: AC,AL,AM,AP,DF,MS,PB,RJ,RO,RR,SC,SE,TO
    // Autorizadores: AM,BA,CE,GO,MG,MS,MT,PE,PR,RN,RS,SP,SVAN,SVRS,SCAN
@@ -304,11 +320,13 @@ METHOD GetWebService( cUf, cServico ) CLASS SefazClass
    RETURN cTexto
 
 METHOD XmlSoapPost() CLASS SefazClass
+
    ::XmlSoapEnvelope()
    ::MicrosoftXmlSoapPost()
    RETURN NIL
 
 METHOD XmlSoapEnvelope() CLASS SefazClass
+
 // Toda comunicacao SOAP depende de um envelope
 // O envelope e um XML que contem o XML dos dados, algo como envelopeinicio + xmldados + envelopefim
 // Por enquanto ha tres tipos de envelope: nfe, cte e mdfe
@@ -331,7 +349,9 @@ METHOD XmlSoapEnvelope() CLASS SefazClass
    RETURN ::cXmlSoap
 
 METHOD MicrosoftXmlSoapPost() CLASS SefazClass
+
    LOCAL oServer, nCont, cRetorno := "*ERRO*"
+
    BEGIN SEQUENCE WITH { |e| Break(e) }
       oServer := win_OleCreateObject( "MSXML2.ServerXMLHTTP")
       IF ::cCertificado != NIL
@@ -361,8 +381,10 @@ METHOD MicrosoftXmlSoapPost() CLASS SefazClass
 
 /*
 FUNCTION CurlSoapPost()
+
    LOCAL oServer, cXmlRetorno := "*ERRO*", aHeader := {}
    LOCAL cCertificadoChavePublica := "", cCertificadoSenha := "", cCertificadoChaveParticular := ""
+
    Aadd( aHeader, [Content-Type: application/soap+xml;charset=utf-8;action="] + ::cSoapAction + ["] )
    Aadd( aHeader, [SOAPAction: "] + ::cServico + ["] )
    Aadd( aHeader, [Content-length: ] + AllTrim( Str( Len( ::cXmlDados ) ) ) }
@@ -397,7 +419,9 @@ FUNCTION CurlSoapPost()
 
 
 FUNCTION UfCodigo( cChave )
+
    LOCAL cUFs, cUf, nPosicao
+
    cUFs = "AC,12,AL,27,AM,13,AP,16,BA,29,CE,23,DF,53,ES,32,GO,52,MG,31,MS,50,MT,51,MA,21,PA,15,PB,25,PE,26,PI,22,PR,41,RJ,33,RO,11,RN,24,RR,14,RS,43,SC,42,SE,28,SP,35,TO,17,"
    nPosicao = At( Substr( cChave, 1, 2 ), cUfs )
    IF nPosicao < 1
@@ -414,7 +438,9 @@ FUNCTION UfCodigo( cChave )
 
 
 STATIC FUNCTION UrlWebService( cUf, cAmbiente, nWsService )
+
    LOCAL cUrlWs := ""
+
    DO CASE
    CASE cUf == "AM" .AND. cAmbiente == WSPRODUCAO
       DO CASE
@@ -757,6 +783,7 @@ STATIC FUNCTION UrlWebService( cUf, cAmbiente, nWsService )
 
 /*
 FUNCTION MsXmlValidaXml( cXml )
+
    LOCAL cRetorno, oDomDoc
 
    cRetorno := "*ERRO*"
@@ -777,7 +804,9 @@ FUNCTION MsXmlValidaXml( cXml )
    RETURN cRetorno
 
 FUNCTION MsXmlValida( cXml )
+
    LOCAL cTipoXml, oDomDoc, oSchema, cRetorno := *ERRO*", lOk
+
    cTipoXml := SefazClass():TipoXml( cXml )
    DO CASE
    CASE cTipoXml == "NFE"
@@ -868,6 +897,7 @@ FUNCTION MsXmlValida( cXml )
    cXML := cXML +'</soap12:Envelope>'
 
 METHOD NfeInutilizacao( cXml, cUf, cCertificado ) CLASS SefazClass
+
    ::cCertificado := cCertificado
    ::cXmlDados    := cXml
    ::cUf          := cUf

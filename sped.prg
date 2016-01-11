@@ -2,6 +2,7 @@
 #include "inkey.ch"
 
 FUNCTION ConsultaSped()
+
    LOCAL GetList := {}, cChave := Space(44), cCertificado := Space(80), oSefaz
 
    IF AppMultiWindow()
@@ -24,16 +25,12 @@ FUNCTION ConsultaSped()
       ENDIF
 
       oSefaz := SefazClass():New()
-      IF Substr( cChave, 21, 2 ) == "55" // NFE
-         MsgExclamation( oSefaz:NfeConsulta( cChave, Trim( cCertificado ) ) )
-      ELSEIF Substr( cChave, 21, 2 ) == "57" // CTE
-         oSefaz:cProjeto := "cte"
-         MsgExclamation( oSefaz:CteConsulta( cChave, Trim( cCertificado ) ) )
-      ELSEIF Substr( cChave, 21, 2 ) == "58" // MDFE
-         oSefaz:cProjeto := "mdfe"
-         MsgExclamation( oSefaz:MdfeConsulta( cChave, Trim( cCertificado ) ) )
-      ELSE
+      DO CASE
+      CASE Substr( cChave, 21, 2 ) == "55" ; MsgExclamation( oSefaz:NfeConsulta( cChave, Trim( cCertificado ) ) )
+      CASE Substr( cChave, 21, 2 ) == "57" ; MsgExclamation( oSefaz:CteConsulta( cChave, Trim( cCertificado ) ) )
+      CASE Substr( cChave, 21, 2 ) == "58" ; MsgExclamation( oSefaz:MdfeConsulta( cChave, Trim( cCertificado ) ) )
+      OTHERWISE
          MsgExclamation( "Documento nao identificado" )
-      ENDIF
+      ENDCASE
    ENDDO
    RETURN NIL

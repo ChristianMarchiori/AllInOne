@@ -204,16 +204,11 @@ FUNCTION ExtractParameter( cTextCmd, mTipo, mLista )
       DB_SCOPE_ALL    := .F.
       FOR mCont = 1 TO 5
          DO CASE
-         CASE mCont = 1
-            mTipo := "all"
-         CASE mCont = 2
-            mTipo := "next"
-         CASE mCont = 3
-            mTipo := "record"
-         CASE mCont = 4
-            mTipo := "for"
-         CASE mCont = 5
-            mTipo := "while"
+         CASE mCont = 1   ;  mTipo := "all"
+         CASE mCont = 2   ;  mTipo := "next"
+         CASE mCont = 3   ;  mTipo := "record"
+         CASE mCont = 4   ;  mTipo := "for"
+         CASE mCont = 5   ;  mTipo := "while"
          ENDCASE
          cTextCmd := " " + cTextCmd + " "
          m_Posi := Array(6)

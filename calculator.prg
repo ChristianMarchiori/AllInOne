@@ -4,6 +4,7 @@
 #include "hbclass.ch"
 
 FUNCTION Calculator()
+
    LOCAL oCalculator := CalculatorClass():New()
 
    IF AppMultiWindow()
@@ -20,6 +21,7 @@ FUNCTION Calculator()
    RETURN NIL
 
 CREATE CLASS CalculatorClass
+
    DATA   nWidth              INIT 31
    DATA   nHeight             INIT 11
    DATA   nTop                INIT 1
@@ -56,6 +58,7 @@ CREATE CLASS CalculatorClass
    ENDCLASS
 
 METHOD Execute() CLASS CalculatorClass
+
    LOCAL cOldColor := SetColor(), nKey, cStrKey
 
    ::nTop  := Int( ( MaxRow() - 12 ) / 2 )
@@ -103,6 +106,7 @@ METHOD Execute() CLASS CalculatorClass
    RETURN NIL
 
 METHOD Percent() CLASS CalculatorClass
+
    ::WriteTape( "%" )
    IF ::cPendingOperation $ "+-"
       ::cValueDisplay := ValToString( ::nValueTotal * Val( ::cValueDisplay ) / 100 )
@@ -114,17 +118,13 @@ METHOD Percent() CLASS CalculatorClass
    RETURN NIL
 
 METHOD Operation( cOperation ) CLASS CalculatorClass
+
    DO CASE
-   CASE ::cPendingOperation == "+"
-      ::nValueTotal := ::nValueTotal + Val( ::cValueDisplay )
-   CASE ::cPendingOperation == "-"
-      ::nValueTotal := ::nValueTotal - Val( ::cValueDisplay )
-   CASE ::cPendingOperation == "*"
-      ::nValueTotal := ::nValueTotal * Val( ::cValueDisplay )
-   CASE ::cPendingOperation == "/"
-      ::nValueTotal := ::nValueTotal / Val( ::cValueDisplay )
-   OTHERWISE
-      ::nValueTotal := Val( ::cValueDisplay )
+   CASE ::cPendingOperation == "+" ; ::nValueTotal := ::nValueTotal + Val( ::cValueDisplay )
+   CASE ::cPendingOperation == "-" ; ::nValueTotal := ::nValueTotal - Val( ::cValueDisplay )
+   CASE ::cPendingOperation == "*" ; ::nValueTotal := ::nValueTotal * Val( ::cValueDisplay )
+   CASE ::cPendingOperation == "/" ; ::nValueTotal := ::nValueTotal / Val( ::cValueDisplay )
+   OTHERWISE                       ; ::nValueTotal := Val( ::cValueDisplay )
    ENDCASE
    ::WriteTape( iif( ::cPendingOperation $ "+-*/", ::cPendingOperation, " " ) )
    ::cValueDisplay     := ValToString( ::nValueTotal )
@@ -137,10 +137,12 @@ METHOD Operation( cOperation ) CLASS CalculatorClass
    RETURN NIL
 
 METHOD InvertSignal() CLASS CalculatorClass
+
    ::cValueDisplay := ValToString( -Val( ::cValueDisplay ) )
    RETURN NIL
 
 METHOD Comma() CLASS CalculatorClass
+
    IF ::lBeginNumber
       ::cValueDisplay := ""
    ENDIF
@@ -154,6 +156,7 @@ METHOD Comma() CLASS CalculatorClass
    RETURN NIL
 
 METHOD Number( cNumber ) CLASS CalculatorClass
+
    IF ::lBeginNumber
       ::cValueDisplay := ""
    ENDIF
@@ -165,12 +168,14 @@ METHOD Number( cNumber ) CLASS CalculatorClass
    RETURN NIL
 
 METHOD Back() CLASS CalculatorClass
+
    IF Len( ::cValueDisplay ) > 0
       ::cValueDisplay := Left( ::cValueDisplay, Len( ::cValueDisplay ) - 1 )
    ENDIF
    RETURN NIL
 
 METHOD Clear() CLASS CalculatorClass
+
    ::cValueDisplay = ""
    IF ::cPendingOperation == "C"
       ::nValueTotal := 0
@@ -179,6 +184,7 @@ METHOD Clear() CLASS CalculatorClass
    RETURN NIL
 
 METHOD Memory() CLASS CalculatorClass
+
    LOCAL cStrKey := " ", nKey := 0
 
    DO WHILE .NOT. cStrKey $ "CR+-" .AND. nKey != K_BS
@@ -198,6 +204,7 @@ METHOD Memory() CLASS CalculatorClass
    RETURN NIL
 
 METHOD Show() CLASS CalculatorClass
+
    LOCAL nCont, nCont2
 
    DispBegin()
@@ -222,6 +229,7 @@ METHOD Show() CLASS CalculatorClass
    RETURN NIL
 
 METHOD WriteTape( cFlag ) CLASS CalculatorClass
+
    IF cFlag == NIL
       Aadd( ::acTape, Pad( "", ::nWidth - 2 ) )
    ELSE
@@ -230,30 +238,24 @@ METHOD WriteTape( cFlag ) CLASS CalculatorClass
    RETURN NIL
 
 METHOD Move( nKey ) CLASS CalculatorClass
+
    ::GUIDestroy()
    RESTORE SCREEN FROM ::cSaveScreen
    DO CASE
-   CASE nKey == K_LEFT
-      ::nLeft := Max( 0, ::nLeft - 1 )
-   CASE nKey == K_RIGHT
-      ::nLeft := Min( MaxCol() - ::nWidth + 1, ::nLeft + 1 )
-   CASE nKey == K_UP
-      ::nTop := Max( 0, ::nTop - 1 )
-   CASE nKey == K_DOWN
-      ::nTop := Min( MaxRow() - ::nHeight + 1, ::nTop + 1 )
-   CASE nKey == K_CTRL_UP
-      ::nTop := 0
-   CASE nKey == K_CTRL_DOWN
-      ::nTop := MaxRow() - ::nHeight + 1
-   CASE nKey == K_CTRL_LEFT
-      ::nLeft := 0
-   CASE nKey == K_CTRL_RIGHT
-      ::nLeft := MaxCol() - ::nWidth + 1
+   CASE nKey == K_LEFT       ; ::nLeft := Max( 0, ::nLeft - 1 )
+   CASE nKey == K_RIGHT      ; ::nLeft := Min( MaxCol() - ::nWidth + 1, ::nLeft + 1 )
+   CASE nKey == K_UP         ; ::nTop  := Max( 0, ::nTop - 1 )
+   CASE nKey == K_DOWN       ; ::nTop  := Min( MaxRow() - ::nHeight + 1, ::nTop + 1 )
+   CASE nKey == K_CTRL_UP    ; ::nTop  := 0
+   CASE nKey == K_CTRL_DOWN  ; ::nTop  := MaxRow() - ::nHeight + 1
+   CASE nKey == K_CTRL_LEFT  ; ::nLeft := 0
+   CASE nKey == K_CTRL_RIGHT ; ::nLeft := MaxCol() - ::nWidth + 1
    ENDCASE
    ::GuiShow()
    RETURN NIL
 
 METHOD ShowTape() CLASS CalculatorClass
+
    LOCAL cScreen
 
    ::GuiDestroy()
@@ -265,6 +267,7 @@ METHOD ShowTape() CLASS CalculatorClass
    RETURN NIL
 
 METHOD LoadSaveValue( lSave ) CLASS CalculatorClass
+
    LOCAL oGet
 
    lSave := iif( lSave == NIL, .f., lSave )
@@ -281,6 +284,7 @@ METHOD LoadSaveValue( lSave ) CLASS CalculatorClass
    RETURN NIL
 
 STATIC FUNCTION ValToString( nValue )
+
    LOCAL cValue := Ltrim( Str( nValue, 50, 16 ) )
 
    IF "." $ cValue
@@ -294,12 +298,13 @@ STATIC FUNCTION ValToString( nValue )
    RETURN cValue
 
 METHOD GUIShow() CLASS CalculatorClass
+
 #ifdef GTWVG
    LOCAL nCont, nCont2, oThisButton
    FOR nCont = 1 TO Len( ::acKeyboard )
       FOR nCont2 = 1 TO Len( ::acKeyboard[ nCont ] )
-         oThisButton := wvgPushButton():New()
-         oThisButton:Caption := ::acKeyboard[ nCont, nCont2 ]
+         oThisButton              := wvgPushButton():New()
+         oThisButton:Caption      := ::acKeyboard[ nCont, nCont2 ]
          oThisButton:PointerFocus := .F.
          oThisButton:Create( , , { -( ::nTop + 1 + nCont * 2 ), -( ::nLeft + 1 + ( nCont2 - 1 ) * 5 ) }, { -1.5, -4 } )
          oThisButton:Activate := &( [{ || __Keyboard( "] + ::acKeyboard[ nCont, nCont2 ] + [" ) }] )
@@ -310,7 +315,9 @@ METHOD GUIShow() CLASS CalculatorClass
    RETURN NIL
 
 METHOD GUIDestroy() CLASS CalculatorClass
+
    LOCAL oButton
+
    FOR EACH oButton IN ::aGUIButtons
 #ifdef GTWVG
       oButton:Destroy()

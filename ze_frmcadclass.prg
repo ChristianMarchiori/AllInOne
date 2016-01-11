@@ -12,6 +12,7 @@
 #define OPTION_BROWSE   "B"
 
 CREATE CLASS frmCadClass INHERIT frmClass
+
    METHOD Edit()
    METHOD Insert()
    METHOD Delete()
@@ -25,21 +26,25 @@ CREATE CLASS frmCadClass INHERIT frmClass
    END CLASS
 
 METHOD UserFunction() CLASS frmCadClass
+
    RETURN NIL
 
 METHOD Edit() CLASS frmCadClass
+
    ::RowIni()
    ::DataEntry( .T. )
    RETURN NIL
 
 METHOD Insert() CLASS frmCadClass
+
    APPEND BLANK
    ::RowIni()
    ::DataEntry( .T. )
    RETURN NIL
 
 METHOD Delete() CLASS frmCadClass
-   rLock()
+
+   RLock()
    DELETE
    SKIP 0
    UNLOCK
@@ -50,22 +55,27 @@ METHOD Delete() CLASS frmCadClass
    RETURN NIL
 
 METHOD First() CLASS frmCadClass
+
    GOTO TOP
    RETURN NIL
 
 METHOD Last() CLASS frmCadClass
+
    GOTO BOTTOM
    RETURN NIL
 
 METHOD Previous() CLASS frmCadClass
+
    SKIP -1
    RETURN NIL
 
 METHOD Next() CLASS frmCadClass
+
    SKIP
    RETURN NIL
 
 METHOD Execute() CLASS frmCadClass
+
    ::FormBegin()
    DO WHILE .T.
       ::RowIni()
@@ -96,6 +106,7 @@ METHOD Execute() CLASS frmCadClass
    RETURN NIL
 
 METHOD DataEntry( lEdit ) CLASS frmCadClass
+
    LOCAL GetList := {}, xVar1 := Space(10)
 
    ::RowIni()

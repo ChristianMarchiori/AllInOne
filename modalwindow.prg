@@ -1,4 +1,5 @@
 FUNCTION ModalWindow()
+
    LOCAL oCrt, nSel
 
    oCrt := WvgCrt():New( /* parent */, /* owner */, { 4, 8 }, { 12, 49 }, , .T. )

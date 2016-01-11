@@ -1,6 +1,7 @@
 PROCEDURE Main
+
    HarbourInit()
    hb_ThreadStart( { || MainMenu( .F. ) } )
    Inkey(3)
-   WaitForThreads()
+   hb_ThreadWaitForAll()
    RETURN

@@ -1,5 +1,7 @@
 FUNCTION pdf()
+
    LOCAL oPDF, nCont, nType
+
    HarbourInit()
    FOR nType = 1 TO 3
       oPDF := PDFClass():New()

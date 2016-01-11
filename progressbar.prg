@@ -3,6 +3,7 @@
 #include "hbgtinfo.ch"
 
 FUNCTION Progressbar()
+
    LOCAL nCont//, oCrt
 
    IF AppMultiWindow()
@@ -26,8 +27,10 @@ FUNCTION Progressbar()
 #Define GRAFTIME 2
 
 FUNCTION GrafProc( nRow, nCol )
+
    LOCAL mSetDevice
    THREAD STATIC GrafInfo := { 1, "X" }
+
    nRow := iif( nRow == NIL, MaxRow() - 1, nRow )
    nCol := iif( nCol == NIL, MaxCol() - 2, nCol )
    IF GrafInfo[ GRAFTIME ] != Time()
@@ -40,6 +43,7 @@ FUNCTION GrafProc( nRow, nCol )
    RETURN .T.
 
 FUNCTION GrafTempo( xContNow, xContTotal )
+
    THREAD STATIC nStaticSecondsOld := 0, nStaticSecondsIni := 0, cStaticTxtBar := "", cStaticTxtText := ""
    LOCAL nSecondsNow, nSecondsRemaining, nSecondsElapsed, nCont, nPos, cTxt, cCorAnt
    LOCAL nPercent, cTexto, mSetDevice

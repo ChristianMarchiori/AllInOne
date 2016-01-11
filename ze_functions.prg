@@ -7,14 +7,18 @@
 THREAD STATIC AppSaveScreen := {}
 
 FUNCTION AppMainThread( xValue )
+
    STATIC AppMainThread
+
    IF xValue != NIL
       AppMainThread := xValue
    ENDIF
    RETURN AppMainThread
 
 FUNCTION AppMultiWindow()
+
    LOCAL lValue
+
    IF "WIN" $ hb_gtInfo( HB_GTI_VERSION )
       lValue := .F.
    ELSE
@@ -23,17 +27,22 @@ FUNCTION AppMultiWindow()
    RETURN lValue
 
 FUNCTION AppUserName( xValue )
+
    STATIC AppUserName := ""
+
    IF xValue != NIL
       AppUserName := xValue
    ENDIF
    RETURN AppUserName
 
 FUNCTION AppMessage()
+
    STATIC AppMessage := { NIL, NIL }
+
    RETURN AppMessage
 
 FUNCTION HarbourInit()
+
    SET SCOREBOARD OFF
    SET DELETED    ON
    SET( _SET_EVENTMASK, INKEY_ALL - INKEY_MOVE ) // + HB_INKEY_GTEVENT )
@@ -70,25 +79,33 @@ FUNCTION HarbourInit()
    RETURN NIL
 
 FUNCTION SetColorTitulo()
+
    RETURN "W/G,N/W,,,W/G"
 
 FUNCTION SetColorNormal()
+
    RETURN "W/B,N/W,,,W/B"
 
 FUNCTION SetColorMensagem()
+
    RETURN "W/N,N/W,,,W/N"
 
 FUNCTION SetColorFocus()
+
    RETURN "N/W,W/N,,,N/W"
 
 FUNCTION SetColorBox()
+
    RETURN "W/GR,N/W,,,W/Gr"
 
 FUNCTION SetColorAlerta()
+
    RETURN "W/R,N/W,,,W/R"
 
 FUNCTION Mensagem( cTexto )
+
    LOCAL cColorOld := SetColor()
+
    cTexto := iif( cTexto == NIL, "", cTexto )
    Scroll( MaxRow()-1, 0, MaxRow(), MaxCol(), 0 )
    @ MaxRow()-1, 0 SAY cTexto
@@ -96,10 +113,12 @@ FUNCTION Mensagem( cTexto )
    RETURN NIL
 
 FUNCTION WSave()
+
    Aadd( AppSaveScreen, SaveScreen() )
    RETURN NIL
 
 FUNCTION WRestore()
+
    IF Len( AppSaveScreen ) > 0
       RestScreen( ,,,,ATail( AppSaveScreen ) )
       aSize( AppSaveScreen, Len( AppSaveScreen ) - 1 )
@@ -107,6 +126,7 @@ FUNCTION WRestore()
    RETURN NIL
 
 FUNCTION WOpen( nUp, nLeft, nRight, nDown, cTitle )
+
    wSave()
    @ nUp, nLeft TO nRight, nDown
    @ nUp+1, nLeft+1 CLEAR TO nRight-1, nDown-1
@@ -114,11 +134,14 @@ FUNCTION WOpen( nUp, nLeft, nRight, nDown, cTitle )
    RETURN NIL
 
 FUNCTION WClose()
+
    WRestore()
    RETURN NIL
 
 FUNCTION PicVal( nLen, nDec )
+
    LOCAL cPicture
+
    nDec := iif( nDec == NIL, 0, nDec )
    cPicture := "999,999,999,999,999,999"
    cPicture := Transform( val( Replicate( "9", nLen - nDec ) ), cPicture )
@@ -128,6 +151,7 @@ FUNCTION PicVal( nLen, nDec )
    RETURN cPicture
 
 FUNCTION SayScroll( cText )
+
    cText := iif( cText == NIL, "", cText )
    Scroll( 2, 0, MaxRow() - 3, MaxCol(), 1 )
    @ MaxRow() - 3, 0 SAY cText
@@ -135,19 +159,24 @@ FUNCTION SayScroll( cText )
 
 #ifdef GTWVG
 FUNCTION MsgYesNo( cText )
+
    RETURN wapi_MessageBox( wapi_GetActiveWindow(), cText, "Confirm", MB_YESNO + MB_ICONQUESTION + MB_DEFBUTTON2 ) == IDYES
 
 FUNCTION MsgExclamation( cText )
+
    RETURN wapi_MessageBox( wapi_GetActiveWindow(), cText, "Atention", MB_ICONASTERISK )
 
 FUNCTION MsgWarning( cText )
+
    RETURN wapi_MessageBox( wapi_GetActiveWindow(), cText, "Warning", MB_ICONEXCLAMATION )
 
 FUNCTION MsgStop( cText )
+
    RETURN wapi_MessageBox( wapi_GetActiveWindow(), cText, "Wait", MB_ICONHAND )
 #endif
 
 FUNCTION ReturnValue( xValue, ... )
+
    RETURN xValue
 
 FUNCTION RecLock()
@@ -182,6 +211,7 @@ FUNCTION RecDelete()
    RETURN NIL
 
 FUNCTION MyTempFile( cExtensao )
+
    RETURN "temp." + cExtensao
 
 FUNCTION MacroType( cExpression )

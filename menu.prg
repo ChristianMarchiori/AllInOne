@@ -2,6 +2,7 @@
 #include "inkey.ch"
 
 FUNCTION MenuCria()
+
    MEMVAR nMenuLevel, oMenuOptions
    PRIVATE nMenuLevel, oMenuOptions
 
@@ -46,6 +47,7 @@ RETURN oMenuOptions
 
 
 STATIC FUNCTION MenuOption( cCaption, oModule )
+
    LOCAL nCont, oLastMenu
    MEMVAR nMenuLevel, oMenuOptions
 
@@ -63,20 +65,25 @@ STATIC FUNCTION MenuOption( cCaption, oModule )
 
 
 STATIC FUNCTION MenuDrop()
+
    MEMVAR nMenuLevel
+
    nMenuLevel++
    RETURN NIL
 *----------------------------------------------------------------
 
 
 STATIC FUNCTION MenuUnDrop()
+
    MEMVAR nMenuLevel
+
    nMenuLevel--
    RETURN NIL
 *----------------------------------------------------------------
 
 
 FUNCTION MainMenu( lWindows )
+
    LOCAL mOpc    := 1
    LOCAL mTecla
    LOCAL mCont, mLenTot, mDife, mEspEntre, mEspFora, mColIni, aMouseMenu, mMenuOpt
@@ -149,13 +156,14 @@ FUNCTION MainMenu( lWindows )
 
 
 STATIC FUNCTION BoxMenu( mLini, mColi, mMenuOpt, mOpc, mTitulo, mSaiSetas, mSaiFunc, aMouseConv, nLevel )
+
    LOCAL mLinf, mColf, mCont, mTecla, aMouseLen, lExit, xLin, xCol, cTexto // , nCont, oDbfs
    LOCAL nMRow, nMCol, cCorAnt
    MEMVAR m_Prog, cDummy
    PRIVATE cDummy
 
 #ifdef GTWVG
-   wvt_DrawImage( 3, 0, MaxRow() - 2, MaxCol(), "jpa.ico" )
+   wvt_DrawImage( 3, 0, MaxRow() - 2, MaxCol(), "image\jpa.ico" )
    @ 20, 10 SAY " background is a small picture, to reduce sample size "
 #ENDIF
    @ 22, 10 SAY " if gt do not accept multiwindow, change AppMultiWindow() in zfunctions.prg"
@@ -294,7 +302,9 @@ STATIC FUNCTION BoxMenu( mLini, mColi, mMenuOpt, mOpc, mTitulo, mSaiSetas, mSaiF
 
 #ifdef GTWVG
 STATIC FUNCTION MenuWvg( mMenuOpt )
+
    LOCAL oMenu, nKey
+
    oMenu  := wvgSetAppWindow():MenuBar()
    BuildMenu( oMenu, mMenuOpt )
    DO WHILE .T.
@@ -313,6 +323,7 @@ STATIC FUNCTION MenuWvg( mMenuOpt )
    RETURN NIL
 
 FUNCTION BuildMenu( oMenu, acMenu )
+
    LOCAL nCont, oSubMenu
    MEMVAR m_Prog
 

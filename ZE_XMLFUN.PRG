@@ -19,6 +19,7 @@
 *----------------------------------------------------------------
 
 FUNCTION XmlTransform( cXml )
+
    LOCAL cRemoveTag, cTag, nCont
 
    cRemoveTag := { ;
@@ -83,7 +84,9 @@ FUNCTION XmlTransform( cXml )
    RETURN cXml
 
 FUNCTION XmlNode( cXml, cNode, lComTag )
+
    LOCAL mInicio, mFim, cResultado := ""
+
    lComTag := iif( lComTag == NIL,.F., lComTag )
    IF " " $ cNode
       cNode := Substr( cNode, 1, At( " ", cNode ) - 1 )
@@ -112,7 +115,9 @@ FUNCTION XmlNode( cXml, cNode, lComTag )
    RETURN cResultado
 
 FUNCTION XmlElement( cXml, cElement )
+
    LOCAL mInicio, mFim, cResultado := ""
+
    mInicio := At( cElement + "=", cXml )
    IF mInicio != 0
       mInicio += 1
@@ -125,12 +130,16 @@ FUNCTION XmlElement( cXml, cElement )
    RETURN cResultado
 
 FUNCTION XmlDate( cData )
+
    LOCAL dDate
+
    dDate := Ctod( Substr( cData, 9, 2 ) + "/" + Substr( cData, 6, 2 ) + "/" + Substr( cData, 1, 4 ) )
    RETURN dDate
 
 FUNCTION XmlTag( cTag, cConteudo )
+
    LOCAL cTexto := ""
+
    cConteudo := Iif( cConteudo == NIL, "", cConteudo )
    cConteudo := AllTrim( cConteudo )
    IF Len( Trim( cConteudo ) ) = 0
@@ -147,7 +156,9 @@ FUNCTION XmlTag( cTag, cConteudo )
 
 
 FUNCTION AtStart( cSearch, cString, nStart, nEnd )
+
    LOCAL nPosicao
+
    nStart := iif( nStart == NIL, 1, nStart )
    nEnd := iif( nEnd == NIL, Len( cString ), nEnd )
    nPosicao := At( cSearch, Substr( cString, nStart, nEnd ) )
@@ -158,6 +169,7 @@ FUNCTION AtStart( cSearch, cString, nStart, nEnd )
 *----------------------------------------------------------------
 
 FUNCTION StringToChr( cTexto )
+
    LOCAL cLetra, cTexto2 := ""
 
    FOR EACH cLetra IN cTexto
@@ -176,6 +188,7 @@ FUNCTION StringToChr( cTexto )
    RETURN cTexto2
 
 FUNCTION ChrToString( cTexto )
+
    LOCAL nCont, cLetra
 
    FOR nCont = 0 TO 255

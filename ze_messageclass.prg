@@ -6,10 +6,13 @@
 #include "hbthread.ch"
 
 FUNCTION AppMessage()
+
    STATIC AppMessage := { NIL, NIL }
+
    RETURN AppMessage
 
 PROCEDURE PUSRMSG
+
    IF AppMessage()[ 2 ]:lExit
       AppMessage()[ 2 ]:Execute()
    ENDIF
@@ -20,6 +23,7 @@ PROCEDURE PUSRMSG
 *----------------------------------------------------------
 
 CREATE CLASS MessageClass
+
    VAR cUser         INIT ""                            // User of window
    VAR lExit         INIT .T.                           // End task
    VAR acMessage     INIT {}                            // Text to show
@@ -34,7 +38,9 @@ CREATE CLASS MessageClass
    ENDCLASS
 
 METHOD Close() CLASS MessageClass
+
    LOCAL nCont
+
    ::lExit := .T.
    IF ::cUser == "SysMain"
       FOR nCont = 2 TO Len( AppMessage() )
@@ -44,6 +50,7 @@ METHOD Close() CLASS MessageClass
    RETURN NIL
 
 METHOD Execute( cUser ) CLASS MessageClass
+
    IF cUser != NIL
       ::cUser := cUser
    ENDIF
@@ -58,6 +65,7 @@ METHOD Execute( cUser ) CLASS MessageClass
    RETURN NIL
 
 METHOD UserExecute() CLASS MessageClass
+
    LOCAL nKey, nCont
 
    hb_gtReLoad( hb_gtInfo( HB_GTI_VERSION ) )
@@ -92,6 +100,7 @@ METHOD UserExecute() CLASS MessageClass
    RETURN NIL
 
 METHOD CheckMasterThread() CLASS MessageClass
+
    IF AppThreadMaster() != NIL
       IF hb_ThreadWait( AppThreadMaster(), 0.1, .T. ) == 1
          ::lExit := .T.
@@ -100,7 +109,9 @@ METHOD CheckMasterThread() CLASS MessageClass
    RETURN NIL
 
 METHOD MainExecute() CLASS MessageClass
+
    LOCAL cnMySql := MySqlClass():New()
+
    MEMVAR m_Prog
    PUBLIC m_Prog := "PUSRMSG"
    hb_gtReLoad( hb_gtInfo( HB_GTI_VERSION ) )
@@ -143,6 +154,7 @@ METHOD MainExecute() CLASS MessageClass
    RETURN NIL
 
 METHOD SelectExecute() CLASS MessageClass
+
    LOCAL aLstUser := {}, nOpcUser := 0
 
    hb_gtReLoad( hb_gtInfo( HB_GTI_VERSION ) )
@@ -175,6 +187,7 @@ METHOD SelectExecute() CLASS MessageClass
    RETURN NIL
 
 METHOD MessageFromUser( cUser, cDateFrom, cText ) CLASS MessageClass
+
   LOCAL nNumWindow := 0, nCont
 
   FOR nCont = 1 TO Len( AppMessage() )
@@ -197,6 +210,7 @@ METHOD MessageFromUser( cUser, cDateFrom, cText ) CLASS MessageClass
   RETURN NIL
 
 METHOD SendMessage() CLASS MessageClass
+
    LOCAL cText := Space(100), GetList := {}, cDateFrom, cnMySql := MySqlClass():New()
    MEMVAR m_Prog
    PUBLIC m_Prog
