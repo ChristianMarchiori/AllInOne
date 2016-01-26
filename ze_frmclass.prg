@@ -102,8 +102,9 @@ METHOD OptionSelect() CLASS frmClass
       ENDIF
    NEXT
    nOpc := Max( nOpc, 1 )
+   @ MaxRow(), 0 SAY ""
    FOR EACH oButton IN ::acButtons
-      @ MaxRow(), iif( nCont == 1, 0, Col() + 2 ) PROMPT oButton
+      @ Row(), iif( Col() == 0, 0, Col() + 2 ) PROMPT oButton
    NEXT
    MENU TO nOpc
    IF nOpc == 0 .OR. LastKey() == K_ESC
