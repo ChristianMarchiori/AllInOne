@@ -1,24 +1,25 @@
-*----------------------------------------------------------------
-* RDBASE - MIMICS DBASE COMMANDS
-* José Quintas - 1999
-*----------------------------------------------------------------
+/*
+----------------------------------------------------------------
+RDBASE - MIMICS DBASE COMMANDS
+José Quintas - 1999
+----------------------------------------------------------------
 
-* 2015.04.01.1300 - Browse não mais bloqueia arquivo
-* 2015.06.18.2011 - Mensagem ref. comandos pra alterar estrutura
-* 2015.07.08.1910 - Correção ref default de escopo só quando análise de escopo
-* 2015.07.13.0950 - RECALL usando mesmos parâmetros de DELETE
-* 2015.09.05.1315 - Correção chamada cmdEdit() em cmdAppend()
-* 2015.10.04.1720 - Browse em rede, ou bloqueia arquivo, ou altera Harbour
-* 2015.10.30.1600 - Keyboard compare using inkey.ch
-* 2015.10.30.1610 - Prevent from too many lines, in standalone use
-*----------------------------------------------------------------
+2015.04.01.1300 - Browse não mais bloqueia arquivo
+2015.06.18.2011 - Mensagem ref. comandos pra alterar estrutura
+2015.07.08.1910 - Correção ref default de escopo só quando análise de escopo
+2015.07.13.0950 - RECALL usando mesmos parâmetros de DELETE
+2015.09.05.1315 - Correção chamada cmdEdit() em cmdAppend()
+2015.10.04.1720 - Browse em rede, ou bloqueia arquivo, ou altera Harbour
+2015.10.30.1600 - Keyboard compare using inkey.ch
+2015.10.30.1610 - Prevent from too many lines, in standalone use
+----------------------------------------------------------------
+*/
 
 #include "inkey.ch"
 #include "hbclass.ch"
-#include "hbgtinfo.ch"
 
-MEMVAR DB_EXCLUSIVE, DB_ODOMETER
-MEMVAR DB_SCOPE_ALL, DB_SCOPE_NEXT, DB_SCOPE_FOR, DB_SCOPE_WHILE, DB_SCOPE_RECORD
+MEMVAR DBASE_EXCLUSIVE, DBASE_ODOMETER
+MEMVAR DBASE_ALL, DBASE_NEXT, DBASE_FOR, DBASE_WHILE, DBASE_RECORD
 MEMVAR cEmptyValue
 MEMVAR m_Name, m_Opc, m_Row, m_Item, m_IniVet, acStructure
 MEMVAR m_Expr, m_Campo, lChanged, m_Posi
@@ -28,19 +29,14 @@ MEMVAR Line, Col, m_Col, Opc, IniVet, Modo
 PROCEDURE RDBASE
 
    LOCAL   nCont, GetList := {}, nKey, acCmdList := {}, nCmdPos := 0, cTextToAnalize, mComando
-   PRIVATE DB_EXCLUSIVE, DB_ODOMETER
-   PRIVATE DB_SCOPE_ALL, DB_SCOPE_NEXT, DB_SCOPE_FOR, DB_SCOPE_WHILE, DB_SCOPE_RECORD
+   PRIVATE DBASE_EXCLUSIVE, DBASE_ODOMETER
+   PRIVATE DBASE_ALL, DBASE_NEXT, DBASE_FOR, DBASE_WHILE, DBASE_RECORD
 
-   IF AppMultiWindow()
-      hb_gtReLoad( hb_GTInfo( HB_GTI_VERSION ) )
-      SetMode( 30, 60 )
-      CLS
-      HB_GtInfo( HB_GTI_ICONRES, "AppIcon" )
-      HB_GtInfo( HB_GTI_WINTITLE, "Calculator" )
-      HarbourInit()
-   ENDIF
-   DB_EXCLUSIVE := .F.
-   DB_ODOMETER  := 100
+   hb_gtReload( "WVG" )
+   SetMode( 33, 80 )
+   CLS
+   DBASE_EXCLUSIVE := .F.
+   DBASE_ODOMETER  := 100
 
    CLOSE DATABASES // pode ter algum aberto
    MsgWarning( "Atention! If you don't know Foxpro command, don't use it!" + HB_EOL() + ;
@@ -49,10 +45,10 @@ PROCEDURE RDBASE
    FOR nCont = 1 TO MaxRow()
       SayScroll()
    NEXT
-   Mensagem( "Type command and <ENTER>, or QUIT to exit" )
+   Mensagem( "Type command and ENTER, or QUIT to exit" )
    cTextToAnalize := ""
    DO WHILE .T.
-      cTextToAnalize := Pad( cTextToAnalize, 200 )
+      cTextToAnalize := Pad( cTextToAnalize, 1000 )
       @ MaxRow() - 3, 0 GET cTextToAnalize PICTURE "@S" + Ltrim( Str( MaxCol() - 1 ) )
       READ
       nKey := LastKey()
@@ -139,7 +135,7 @@ PROCEDURE RDBASE
 
 FUNCTION ExtractParameter( cTextCmd, mTipo, mLista )
 
-   LOCAL mCont, mParametro, m_Procu, m_Inicio, m_Final, mContFor, mContWhil, m_Posi, mContReco, mContNext, mContAll, mContIni, mTemp, mContFim
+   LOCAL mCont, mParametro, m_Procu, mContIni, mTemp, mContFim
 
    cTextCmd        := AllTrim( cTextCmd )
 
@@ -196,115 +192,6 @@ FUNCTION ExtractParameter( cTextCmd, mTipo, mLista )
       ENDDO
       RETURN mParametro
 
-   CASE mTipo == "escopo"
-      DB_SCOPE_FOR    := ".T."
-      DB_SCOPE_WHILE  := ".T."
-      DB_SCOPE_NEXT   := 0
-      DB_SCOPE_RECORD := 0
-      DB_SCOPE_ALL    := .F.
-      FOR mCont = 1 TO 5
-         DO CASE
-         CASE mCont = 1   ;  mTipo := "all"
-         CASE mCont = 2   ;  mTipo := "next"
-         CASE mCont = 3   ;  mTipo := "record"
-         CASE mCont = 4   ;  mTipo := "for"
-         CASE mCont = 5   ;  mTipo := "while"
-         ENDCASE
-         cTextCmd := " " + cTextCmd + " "
-         m_Posi := Array(6)
-         mContfor  := At( " for ", Lower( cTextCmd ) )
-         mContwhil := At( " while ", Lower( cTextCmd ) )
-         IF mContwhil == 0
-            mContwhil := At( " whil ", Lower( cTextCmd ) )
-         ENDIF
-         mContall  := At( " all ",  Lower( cTextCmd ) )
-         mContnext := At( " next ", Lower( cTextCmd ) )
-         mContReco := At( " record ", Lower( cTextCmd ) )
-         IF mContReco == 0
-            mContReco := At( " recor ", Lower( cTextCmd ) )
-            IF mContReco == 0
-               mContReco := At( " reco ", Lower( cTextCmd ) )
-            ENDIF
-         ENDIF
-         m_Posi[ 1 ] := mContall
-         m_Posi[ 2 ] := mContnext
-         m_Posi[ 3 ] := mContReco
-         m_Posi[ 4 ] := Len( cTextCmd )
-         m_Posi[ 5 ] := mContfor
-         m_Posi[ 6 ] := mContwhil
-         aSort( m_Posi )
-         // retira parametro all
-         DO CASE
-         CASE mTipo == "all" .AND. mContall != 0
-            DB_SCOPE_ALL := .T.
-            //m_Inicio := aScan( m_Posi, mContall )
-            //m_Final  := m_Posi[ m_Inicio + 1 ]
-            cTextCmd   := Stuff( cTextCmd, mContall, 4, "" )
-            // retira e valida parametro next
-
-         CASE mTipo == "next" .AND. mContnext != 0
-            m_Inicio := aScan( m_Posi, mContnext )
-            m_Final  := m_Posi[ m_Inicio + 1 ]
-            DB_SCOPE_NEXT := Substr( cTextCmd, mContnext + 1, m_Final - mContnext )
-            cTextCmd   := Stuff( cTextCmd, mContnext, m_Final - mContnext, "" )
-            DB_SCOPE_NEXT := Substr( DB_SCOPE_NEXT, At( " ", DB_SCOPE_NEXT ) )
-            DB_SCOPE_ALL := .F.
-            IF MacroType( DB_SCOPE_NEXT ) != "N"
-               SayScroll( "Invalid NEXT" )
-               RETURN .F.
-            ENDIF
-            IF &( DB_SCOPE_NEXT ) < 0
-               SayScroll( "Invalid NEXT" )
-               RETURN .F.
-            ENDIF
-            DB_SCOPE_NEXT = &( DB_SCOPE_NEXT )
-
-         // retira e valida parametro record
-         CASE mTipo=="record" .AND. mContReco != 0
-            m_Inicio := aScan( m_Posi, mContReco )
-            m_Final  := m_Posi[ m_Inicio + 1 ]
-            DB_SCOPE_RECORD := Substr( cTextCmd, mContReco + 1, m_Final - mContReco )
-            cTextCmd   := Stuff( cTextCmd, mContReco, m_Final - mContReco, "" )
-            DB_SCOPE_RECORD := Substr( DB_SCOPE_RECORD, At( " ", DB_SCOPE_RECORD ) )
-            IF MacroType( DB_SCOPE_RECORD ) != "N"
-               SayScroll( "Invalid RECORD" )
-               RETURN .F.
-            ENDIF
-            DB_SCOPE_RECORD := &( DB_SCOPE_RECORD )
-            IF DB_SCOPE_RECORD  < 1 .OR. DB_SCOPE_RECORD > LastRec()
-               SayScroll( "Record not exist" )
-               RETURN .F.
-            ENDIF
-
-         // retira e valida parametro for
-         CASE mTipo=="for" .AND. mContfor != 0
-            m_Inicio := aScan( m_Posi, mContfor )
-            m_Final  := m_Posi[ m_Inicio + 1 ]
-            DB_SCOPE_FOR := Substr( cTextCmd, mContfor + 1, m_Final - mContfor )
-            cTextCmd   := Stuff( cTextCmd, mContfor, m_Final - mContfor, "" )
-            DB_SCOPE_FOR := Substr( DB_SCOPE_FOR, At( " ", DB_SCOPE_FOR ) )
-            DB_SCOPE_ALL := .T.
-            IF MacroType( DB_SCOPE_FOR ) != "L"
-               SayScroll( "Invalid FOR" )
-               RETURN .F.
-            ENDIF
-         // retira e valida parametro while
-         CASE mTipo=="while" .AND. mContwhil != 0
-            m_Inicio := aScan( m_Posi, mContwhil )
-            m_Final  := m_Posi[ m_Inicio + 1 ]
-            DB_SCOPE_WHILE := Substr( cTextCmd, mContwhil + 1, m_Final - mContwhil )
-            cTextCmd   := Stuff( cTextCmd, mContwhil, m_Final - mContwhil, "" )
-            DB_SCOPE_WHILE := Substr( DB_SCOPE_WHILE, At( " ", DB_SCOPE_WHILE ) )
-            DB_SCOPE_ALL := .F.
-            IF MacroType( DB_SCOPE_WHILE ) != "L"
-               SayScroll( "Invalid WHILE" )
-               RETURN .F.
-            ENDIF
-         ENDCASE
-         cTextCmd := Alltrim( cTextCmd )
-      NEXT
-      mParametro := .T.
-
    CASE mTipo == "to"
       cTextCmd     := " " + cTextCmd + " "
       mParametro := ""
@@ -345,22 +232,22 @@ STATIC FUNCTION cmdDelete( cTextToAnalize )
       SayScroll( "No file in use" )
       RETURN NIL
    ENDIF
-   IF .NOT. ExtractParameter( @cTextToAnalize, "escopo" )
+   IF .NOT. ExtractForWhile( @cTextToAnalize )
       RETURN NIL
    ENDIF
    IF Len( cTextToAnalize ) != 0
       SayScroll( "Invalid " + cTextToAnalize )
       RETURN NIL
    ENDIF
-   IF DB_SCOPE_RECORD == 0 .AND. DB_SCOPE_NEXT == 0 .AND. DB_SCOPE_FOR == ".T." .AND. DB_SCOPE_WHILE == ".T." .AND. .NOT. DB_SCOPE_ALL
-      DB_SCOPE_RECORD := RecNo()
+   IF DBASE_RECORD == 0 .AND. DBASE_NEXT == 0 .AND. DBASE_FOR == ".T." .AND. DBASE_WHILE == ".T." .AND. .NOT. DBASE_ALL
+      DBASE_RECORD := RecNo()
    ENDIF
    // executa comando
    DO CASE
-   CASE DB_SCOPE_ALL
+   CASE DBASE_ALL
       GOTO TOP
-   CASE DB_SCOPE_RECORD != 0
-      GOTO DB_SCOPE_RECORD
+   CASE DBASE_RECORD != 0
+      GOTO DBASE_RECORD
    ENDCASE
    m_Contreg := 0
    m_Contdel := 0
@@ -368,22 +255,22 @@ STATIC FUNCTION cmdDelete( cTextToAnalize )
    SayScroll()
    DO WHILE nKey != K_ESC .AND. .NOT. Eof()
       nKey = Inkey()
-      IF .NOT. &( DB_SCOPE_WHILE )
+      IF .NOT. &( DBASE_WHILE )
          EXIT
       ENDIF
       m_Contreg := m_Contreg + 1
-      IF &( DB_SCOPE_FOR )
+      IF &( DBASE_FOR )
          RecDelete()
          m_Contdel := m_Contdel + 1
-         IF Mod( m_Contdel, DB_ODOMETER ) == 0
+         IF Mod( m_Contdel, DBASE_ODOMETER ) == 0
             @ MaxRow() - 3, 0 SAY Str( m_Contdel ) + " record(s) deleted"
          ENDIF
       ENDIF
-      IF DB_SCOPE_RECORD != 0
+      IF DBASE_RECORD != 0
          EXIT
       ENDIF
       SKIP
-      IF m_Contreg == DB_SCOPE_NEXT
+      IF m_Contreg == DBASE_NEXT
          EXIT
       ENDIF
    ENDDO
@@ -454,9 +341,9 @@ STATIC FUNCTION cmdEdit( cTextToAnalize )
          DO CASE
          CASE LastKey() == K_ESC
             EXIT
-         CASE LastKey() == 18 // .OR. ( LastKey() == 5 .AND. Pad( ReadVar(), 10 ) == Pad( GetList[ 1, 2 ], 10 ) )
+         CASE LastKey() == K_CTRL_L // .OR. ( LastKey() == K_UP .AND. Pad( ReadVar(), 10 ) == Pad( GetList[ 1, 2 ], 10 ) )
             m_tela := m_tela - 1
-         CASE LastKey() = 23
+         CASE LastKey() = K_CTRL_W
             m_grava := .T.
             EXIT
          OTHERWISE
@@ -479,9 +366,9 @@ STATIC FUNCTION cmdEdit( cTextToAnalize )
          NEXT
       ENDIF
       DO CASE
-      CASE LastKey() = K_ESC .OR. LastKey() = 23
+      CASE LastKey() = K_ESC .OR. LastKey() = K_CTRL_W
          EXIT
-      CASE LastKey() == 18
+      CASE LastKey() == K_CTRL_R
          IF .NOT. Bof()
             SKIP -1
          ENDIF
@@ -606,16 +493,16 @@ STATIC FUNCTION cmdListData( cTextToAnalize, mComando )
    ENDIF
    cTextToAnalize = " " + cTextToAnalize + " "
 
-   IF .NOT. ExtractParameter( @cTextToAnalize, "escopo" )
+   IF .NOT. ExtractForWhile( @cTextToAnalize )
       RETURN NIL
    ENDIF
 
-   IF DB_SCOPE_RECORD == 0 .AND. DB_SCOPE_NEXT == 0 .AND. DB_SCOPE_WHILE == ".T."
-      IF .NOT. DB_SCOPE_ALL
+   IF DBASE_RECORD == 0 .AND. DBASE_NEXT == 0 .AND. DBASE_WHILE == ".T."
+      IF .NOT. DBASE_ALL
          IF mComando == "list"
-            DB_SCOPE_ALL := .T.
+            DBASE_ALL := .T.
          ELSE
-            DB_SCOPE_RECORD := RecNo()
+            DBASE_RECORD := RecNo()
          ENDIF
       ENDIF
    ENDIF
@@ -635,22 +522,22 @@ STATIC FUNCTION cmdListData( cTextToAnalize, mComando )
    // lista do indicado
 
    DO CASE
-   CASE DB_SCOPE_ALL
+   CASE DBASE_ALL
       GOTO TOP
-   CASE DB_SCOPE_RECORD != 0
-      GOTO DB_SCOPE_RECORD
+   CASE DBASE_RECORD != 0
+      GOTO DBASE_RECORD
    ENDCASE
 
    m_Contreg = 0
    nKey   = 0
    DO WHILE nKey != K_ESC .AND. .NOT. Eof()
       nKey = Inkey()
-      IF .NOT. &( DB_SCOPE_WHILE )
+      IF .NOT. &( DBASE_WHILE )
          EXIT
       ENDIF
       m_Contreg = m_Contreg + 1
       cTxt := ""
-      IF &( DB_SCOPE_FOR )
+      IF &( DBASE_FOR )
          cTxt := cTxt + Str( RecNo(), 6 ) + " " + iif( Deleted(), "del", "   " ) + " "
          FOR nCont = 1 TO Len( m_Lista )
             m_item = m_lista[ nCont ]
@@ -667,11 +554,11 @@ STATIC FUNCTION cmdListData( cTextToAnalize, mComando )
             cTxt := Substr( cTxt, MaxCol() + 2 )
          ENDDO
       ENDIF
-      IF DB_SCOPE_RECORD != 0
+      IF DBASE_RECORD != 0
          EXIT
       ENDIF
       SKIP
-      IF m_Contreg = DB_SCOPE_NEXT
+      IF m_Contreg = DBASE_NEXT
          EXIT
       ENDIF
    ENDDO
@@ -846,12 +733,12 @@ STATIC FUNCTION cmdSum( cTextToAnalize )
 
    m_to     = ExtractParameter( @cTextToAnalize, "to" )
 
-   IF .NOT. ExtractParameter( @cTextToAnalize, "escopo" )
+   IF .NOT. ExtractForWhile( @cTextToAnalize )
       RETURN NIL
    ENDIF
 
-   IF DB_SCOPE_RECORD == 0 .AND. DB_SCOPE_NEXT == 0 .AND. DB_SCOPE_WHILE == ".T." .AND. .NOT. DB_SCOPE_ALL // DB_SCOPE_FOR == ".T." .AND.
-      DB_SCOPE_ALL := .T.
+   IF DBASE_RECORD == 0 .AND. DBASE_NEXT == 0 .AND. DBASE_WHILE == ".T." .AND. .NOT. DBASE_ALL // DBASE_FOR == ".T." .AND.
+      DBASE_ALL := .T.
    ENDIF
 
    m_Lista := {}
@@ -877,10 +764,10 @@ STATIC FUNCTION cmdSum( cTextToAnalize )
    // executa comando
 
    DO CASE
-   CASE DB_SCOPE_ALL
+   CASE DBASE_ALL
       GOTO TOP
-   CASE DB_SCOPE_RECORD != 0
-      GOTO DB_SCOPE_RECORD
+   CASE DBASE_RECORD != 0
+      GOTO DBASE_RECORD
    ENDCASE
 
    m_Contreg = 0
@@ -889,25 +776,25 @@ STATIC FUNCTION cmdSum( cTextToAnalize )
    SayScroll()
    DO WHILE nKey != K_ESC .AND. .NOT. Eof()
       nKey = Inkey()
-      IF .NOT. &( DB_SCOPE_WHILE )
+      IF .NOT. &( DBASE_WHILE )
          EXIT
       ENDIF
       m_Contreg = m_Contreg + 1
-      IF &( DB_SCOPE_FOR )
+      IF &( DBASE_FOR )
          FOR nCont = 1 TO Len( m_Lista )
             m_item = m_lista[ nCont ]
             m_soma[ nCont ] = m_soma[ nCont ] + &( m_item )
          NEXT
          m_Contsum += 1
-         IF Mod( m_Contsum, DB_ODOMETER ) = 0
+         IF Mod( m_Contsum, DBASE_ODOMETER ) = 0
             @ MaxRow()-3, 0 SAY Str( m_Contsum ) + " record(s) in sum"
          ENDIF
       ENDIF
-      IF DB_SCOPE_RECORD != 0
+      IF DBASE_RECORD != 0
          EXIT
       ENDIF
       SKIP
-      IF m_Contreg = DB_SCOPE_NEXT
+      IF m_Contreg = DBASE_NEXT
          EXIT
       ENDIF
    ENDDO
@@ -1065,19 +952,19 @@ STATIC FUNCTION cmdAppend( cTextToAnalize )
       SayScroll( "File in use" )
       RETURN NIL
    ENDIF
-   IF .NOT. ExtractParameter( @cTextToAnalize, "escopo" )
+   IF .NOT. ExtractForWhile( @cTextToAnalize )
       RETURN NIL
    ENDIF
-   IF len( cTextToAnalize ) != 0 .OR. DB_SCOPE_RECORD != 0 .OR. DB_SCOPE_NEXT != 0 .OR. DB_SCOPE_WHILE != ".T."
+   IF len( cTextToAnalize ) != 0 .OR. DBASE_RECORD != 0 .OR. DBASE_NEXT != 0 .OR. DBASE_WHILE != ".T."
       SayScroll( "Invalid parameters in APPEND" )
       RETURN NIL
    ENDIF
    // executa comando
    mQtRec := LastRec()
    IF m_sdf
-      APPEND FROM ( cFileName ) FOR &( DB_SCOPE_FOR ) WHILE ( Inkey() != K_ESC ) SDF
+      APPEND FROM ( cFileName ) FOR &( DBASE_FOR ) WHILE ( Inkey() != K_ESC ) SDF
    ELSE
-      APPEND FROM ( cFileName ) FOR &( DB_SCOPE_FOR ) WHILE ( Inkey() != K_ESC )
+      APPEND FROM ( cFileName ) FOR &( DBASE_FOR ) WHILE ( Inkey() != K_ESC )
    ENDIF
    SayScroll( Ltrim( Str( LastRec() - mQtRec ) ) + " Record(s) appended" )
    RETURN NIL
@@ -1097,7 +984,7 @@ STATIC FUNCTION cmdCopy( cTextToAnalize )
    m_extend = ExtractParameter( @cTextToAnalize, "extended" )
    m_sdf    = ExtractParameter( @cTextToAnalize, "sdf" )
    m_To     = ExtractParameter( @cTextToAnalize, "to" )
-   IF .NOT. ExtractParameter( @cTextToAnalize, "escopo" )
+   IF .NOT. ExtractForWhile( @cTextToAnalize )
       RETURN NIL
    ENDIF
    IF len( cTextToAnalize ) != 0
@@ -1108,8 +995,8 @@ STATIC FUNCTION cmdCopy( cTextToAnalize )
       SayScroll( "Need destination filename" )
       RETURN NIL
    ENDIF
-   IF DB_SCOPE_NEXT == 0 .AND. DB_SCOPE_RECORD == 0
-      DB_SCOPE_NEXT := LastRec()
+   IF DBASE_NEXT == 0 .AND. DBASE_RECORD == 0
+      DBASE_NEXT := LastRec()
    ENDIF
 
    IF .NOT. "." $ m_to
@@ -1131,33 +1018,33 @@ STATIC FUNCTION cmdCopy( cTextToAnalize )
          COPY TO ( m_to ) STRUCTURE
       ENDIF
 
-   CASE DB_SCOPE_RECORD != 0
+   CASE DBASE_RECORD != 0
       IF m_Sdf
-         COPY TO ( m_To ) SDF RECORD ( DB_SCOPE_RECORD )
+         COPY TO ( m_To ) SDF RECORD ( DBASE_RECORD )
       ELSE
-         COPY TO ( m_To ) RECORD ( DB_SCOPE_RECORD )
+         COPY TO ( m_To ) RECORD ( DBASE_RECORD )
       ENDIF
 
-   CASE DB_SCOPE_WHILE != ".T." .OR. "while .T." $ Lower( cTextToAnalize )
+   CASE DBASE_WHILE != ".T." .OR. "while .T." $ Lower( cTextToAnalize )
       IF m_Sdf
-         COPY TO ( m_To ) FOR &( DB_SCOPE_FOR ) WHILE &( DB_SCOPE_WHILE ) NEXT DB_SCOPE_NEXT SDF
+         COPY TO ( m_To ) FOR &( DBASE_FOR ) WHILE &( DBASE_WHILE ) NEXT DBASE_NEXT SDF
       ELSE
-         COPY TO ( m_To ) FOR &( DB_SCOPE_FOR ) WHILE &( DB_SCOPE_WHILE ) NEXT DB_SCOPE_NEXT
+         COPY TO ( m_To ) FOR &( DBASE_FOR ) WHILE &( DBASE_WHILE ) NEXT DBASE_NEXT
       ENDIF
 
-   CASE .NOT. DB_SCOPE_NEXT != 0
+   CASE .NOT. DBASE_NEXT != 0
       IF m_Sdf
-         COPY TO ( m_To ) FOR &( DB_SCOPE_FOR ) NEXT DB_SCOPE_NEXT SDF
+         COPY TO ( m_To ) FOR &( DBASE_FOR ) NEXT DBASE_NEXT SDF
       ELSE
-         COPY TO ( m_To ) FOR &( DB_SCOPE_FOR ) NEXT DB_SCOPE_NEXT
+         COPY TO ( m_To ) FOR &( DBASE_FOR ) NEXT DBASE_NEXT
       ENDIF
 
    OTHERWISE
       GOTO TOP
       IF m_sdf
-         COPY TO ( m_to ) FOR &( DB_SCOPE_FOR ) sdf
+         COPY TO ( m_to ) FOR &( DBASE_FOR ) sdf
       ELSE
-         COPY TO ( m_to ) FOR &( DB_SCOPE_FOR )
+         COPY TO ( m_to ) FOR &( DBASE_FOR )
       ENDIF
 
    ENDCASE
@@ -1173,12 +1060,12 @@ STATIC FUNCTION cmdReplace( cTextToAnalize )
       SayScroll( "No file in use" )
       RETURN NIL
    ENDIF
-   IF .NOT. ExtractParameter( @cTextToAnalize, "escopo" )
+   IF .NOT. ExtractForWhile( @cTextToAnalize )
       RETURN NIL
    ENDIF
 
-   IF DB_SCOPE_RECORD == 0 .AND. DB_SCOPE_NEXT == 0 .AND. DB_SCOPE_FOR == ".T." .AND. DB_SCOPE_WHILE = ".T." .AND. .NOT. DB_SCOPE_ALL
-      DB_SCOPE_RECORD = RecNo()
+   IF DBASE_RECORD == 0 .AND. DBASE_NEXT == 0 .AND. DBASE_FOR == ".T." .AND. DBASE_WHILE = ".T." .AND. .NOT. DBASE_ALL
+      DBASE_RECORD = RecNo()
    ENDIF
 
    // retira nomes dos campos e conteudos
@@ -1219,10 +1106,10 @@ STATIC FUNCTION cmdReplace( cTextToAnalize )
    // executa comando
 
    DO CASE
-   CASE DB_SCOPE_ALL
+   CASE DBASE_ALL
       GOTO TOP
-   CASE DB_SCOPE_RECORD != 0
-      GOTO DB_SCOPE_RECORD
+   CASE DBASE_RECORD != 0
+      GOTO DBASE_RECORD
    ENDCASE
 
    m_Contreg = 0
@@ -1231,11 +1118,11 @@ STATIC FUNCTION cmdReplace( cTextToAnalize )
    SayScroll()
    DO WHILE nKey != K_ESC .AND. .NOT. Eof()
       nKey = Inkey()
-      IF .NOT. &( DB_SCOPE_WHILE )
+      IF .NOT. &( DBASE_WHILE )
          EXIT
       ENDIF
       m_Contreg = m_Contreg + 1
-      IF &( DB_SCOPE_FOR )
+      IF &( DBASE_FOR )
          DO WHILE .T.
             IF rLock()
                EXIT
@@ -1254,15 +1141,15 @@ STATIC FUNCTION cmdReplace( cTextToAnalize )
          NEXT
 
          m_Contrep = m_Contrep + 1
-         IF Mod( m_Contrep, DB_ODOMETER ) = 0
+         IF Mod( m_Contrep, DBASE_ODOMETER ) = 0
             @ Row(), 0 SAY str( m_Contrep ) + " record(s) updated"
          ENDIF
       ENDIF
-      IF DB_SCOPE_RECORD != 0
+      IF DBASE_RECORD != 0
          EXIT
       ENDIF
       SKIP
-      IF m_Contreg = DB_SCOPE_NEXT
+      IF m_Contreg = DBASE_NEXT
          EXIT
       ENDIF
    ENDDO
@@ -1279,25 +1166,25 @@ STATIC FUNCTION cmdLocate( cTextToAnalize )
       SayScroll( "No file in use" )
       RETURN NIL
    ENDIF
-   IF .NOT. ExtractParameter( @cTextToAnalize, "escopo" )
+   IF .NOT. ExtractForWhile( @cTextToAnalize )
       RETURN NIL
    ENDIF
 
-   IF len( cTextToAnalize ) != 0 .OR. DB_SCOPE_RECORD != 0
+   IF len( cTextToAnalize ) != 0 .OR. DBASE_RECORD != 0
       SayScroll( "Invalid parameter " + cTextToAnalize )
       RETURN NIL
    ENDIF
 
-   IF DB_SCOPE_ALL
+   IF DBASE_ALL
       GOTO TOP
    ENDIF
 
-   LOCATE FOR &( DB_SCOPE_FOR ) WHILE &( DB_SCOPE_WHILE ) .AND. Inkey() != K_ESC
+   LOCATE FOR &( DBASE_FOR ) WHILE &( DBASE_WHILE ) .AND. Inkey() != K_ESC
 
    IF LastKey() = K_ESC
       SayScroll( "Cancelled" )
    ELSE
-     IF Eof() .OR. .NOT. &( DB_SCOPE_WHILE )
+     IF Eof() .OR. .NOT. &( DBASE_WHILE )
         SayScroll( "Not found" )
       ENDIF
    ENDIF
@@ -1431,7 +1318,7 @@ STATIC FUNCTION cmdModifyStructure( cTextToAnalize )
          fErase( mTempFile )
          EXIT
 
-      CASE Lower( chr( LastKey() ) ) == "i" .OR. LastKey()==13
+      CASE Lower( chr( LastKey() ) ) == "i" .OR. LastKey() == K_ENTER
          m_row = ROW()
          IF Lower( chr( LastKey() ) ) == "i" .OR. ;
             acStructure[ m_opc ] = cEmptyValue
@@ -1452,7 +1339,7 @@ STATIC FUNCTION cmdModifyStructure( cTextToAnalize )
          @ m_row, 48 GET m_len  PICTURE "999" VALID LenOk( m_Len, m_Type )
          @ m_row, 56 GET m_dec  PICTURE "99"  VALID DecimaisOk( m_Dec, m_Type )
          READ
-         IF LastKey()#K_ESC
+         IF LastKey() # K_ESC
             acStructure[ m_opc ] = " " + m_name + " ³ " + substr( m_tipos, at( m_type, m_tipos ), 9 ) + " ³  " + str( m_len, 3 ) + "  ³ " + str( m_dec, 3 ) + " "
             m_mudou = .T.
          ELSE
@@ -1474,13 +1361,13 @@ FUNCTION func_modi
    DO CASE
    CASE modo#3
       RETURN 2
-   CASE LastKey() == 1
+   CASE LastKey() == K_HOME
       KEYBOARD Chr( K_CTRL_PGUP )
       RETURN 2
-   CASE LastKey() == 6
+   CASE LastKey() == K_END
       KEYBOARD Chr( K_CTRL_PGDN )
       RETURN 2
-   CASE str( LastKey(), 3 ) $ " 27, 13"
+   CASE LastKey() == K_ESC .OR. LastKey() == K_ENTER
       RETURN 0
    CASE Lower( chr( LastKey() ) ) $ "qsid"
       RETURN 0
@@ -1703,7 +1590,7 @@ STATIC FUNCTION cmdRecall( cTextToAnalize )
       SayScroll( "No file in use" )
       RETURN NIL
    ENDIF
-   IF .NOT. ExtractParameter( @cTextToAnalize, "escopo" )
+   IF .NOT. ExtractForWhile( @cTextToAnalize )
       RETURN NIL
    ENDIF
 
@@ -1712,37 +1599,37 @@ STATIC FUNCTION cmdRecall( cTextToAnalize )
       RETURN NIL
    ENDIF
 
-   IF DB_SCOPE_RECORD == 0 .AND. DB_SCOPE_NEXT == 0 .AND. DB_SCOPE_FOR == ".T." .AND. DB_SCOPE_WHILE == ".T." .AND. .NOT. DB_SCOPE_ALL
-      DB_SCOPE_RECORD := RecNo()
+   IF DBASE_RECORD == 0 .AND. DBASE_NEXT == 0 .AND. DBASE_FOR == ".T." .AND. DBASE_WHILE == ".T." .AND. .NOT. DBASE_ALL
+      DBASE_RECORD := RecNo()
    ENDIF
 
    DO CASE
-   CASE DB_SCOPE_ALL
+   CASE DBASE_ALL
       GOTO TOP
-   CASE DB_SCOPE_RECORD != 0
-      GOTO ( DB_SCOPE_RECORD )
+   CASE DBASE_RECORD != 0
+      GOTO ( DBASE_RECORD )
    ENDCASE
 
    SayScroll()
    DO WHILE nKey != K_ESC .AND. .NOT. Eof()
       nKey = Inkey()
-      IF .NOT. &( DB_SCOPE_WHILE )
+      IF .NOT. &( DBASE_WHILE )
          EXIT
       ENDIF
       nContreg += 1
-      IF &( DB_SCOPE_FOR )
+      IF &( DBASE_FOR )
          RecLock()
          RECALL
          nContDel += 1
-         IF Mod( nContDel, DB_ODOMETER ) = 0
+         IF Mod( nContDel, DBASE_ODOMETER ) = 0
             @ MaxRow()-3, 0 SAY Str( nContDel ) + " record(s) recalled"
          ENDIF
       ENDIF
-      IF DB_SCOPE_RECORD != 0
+      IF DBASE_RECORD != 0
          EXIT
       ENDIF
       SKIP
-      IF nContReg == DB_SCOPE_NEXT
+      IF nContReg == DBASE_NEXT
          EXIT
       ENDIF
    ENDDO
@@ -1818,7 +1705,7 @@ STATIC FUNCTION cmdSet( cTextToAnalize )
          ELSE
             SET EXCLUSIVE OFF
          ENDIF
-         DB_EXCLUSIVE := lOn
+         DBASE_EXCLUSIVE := lOn
       ENDCASE
    CASE cSet $ "filter,history,index,order,relation"
       IF cSet $ "filter,index,order,relation" .AND. .NOT. Used()
@@ -1973,7 +1860,7 @@ STATIC FUNCTION cmdRun( cTextToAnalize )
    wSave()
    RunCmd( cTextToAnalize )
    ?
-   @ MaxRow(), 0 SAY "Hit <ESC> to continue"
+   @ MaxRow(), 0 SAY "Hit ESC to continue"
    DO WHILE Inkey(0) != K_ESC
    ENDDO
    wRestore()
@@ -1988,7 +1875,7 @@ STATIC FUNCTION cmdBrowse()
    ENDIF
    MsgExclamation( "Do not change in browse mode" )
    wSave()
-   Mensagem( "Select and <ENTER>, <ESC> abort, to change record exit and use EDIT" )
+   Mensagem( "Select and ENTER, ESC abort, to change record exit and use EDIT" )
    Browse( 2, 0, MaxRow() - 3, MaxCol() )
    wRestore()
    RecUnlock()
@@ -2016,7 +1903,7 @@ STATIC FUNCTION cmdPack()
       SayScroll( "No file in use" )
       RETURN NIL
    ENDIF
-   IF .NOT. DB_EXCLUSIVE
+   IF .NOT. DBASE_EXCLUSIVE
       SayScroll( "Only available in exclusive mode" )
       RETURN NIL
    ENDIF
@@ -2031,7 +1918,7 @@ STATIC FUNCTION cmdReindex()
       SayScroll( "No file in use" )
       RETURN NIL
    ENDIF
-   IF .NOT. DB_EXCLUSIVE
+   IF .NOT. DBASE_EXCLUSIVE
       SayScroll( "Only available in exclusive mode" )
       RETURN NIL
    ENDIF
@@ -2111,7 +1998,7 @@ STATIC FUNCTION cmdZap()
       SayScroll( "No file in use" )
       RETURN NIL
    ENDIF
-   IF .NOT. DB_EXCLUSIVE
+   IF .NOT. DBASE_EXCLUSIVE
       SayScroll( "Only available in exclusive mode" )
       RETURN NIL
    ENDIF
@@ -2138,3 +2025,80 @@ STATIC FUNCTION cmdGoTo( cTextToAnalize )
       GOTO &( cTextToAnalize )
    ENDIF
    RETURN NIL
+
+
+STATIC FUNCTION ExtractForWhile( cTextCmd )
+
+   LOCAL oElement, aParameters, nPos, cWord, nCont
+
+   aParameters  := Array( 6 )
+   aParameters[ 1 ] := { "for",    "", 0, 0 }
+   aParameters[ 2 ] := { "while",  "", 0, 0 }
+   aParameters[ 3 ] := { "next",   "", 0, 0 }
+   aParameters[ 4 ] := { "record", "", 0, 0 }
+   aParameters[ 5 ] := { "all",    "", 0, 0 }
+   aParameters[ 6 ] := { Chr(205), "", 0, 0 } // so pra ter o fim
+
+   cTextCmd := " " + cTextCmd + "  "
+
+   FOR EACH oElement IN aParameters
+      cWord := oElement[ 1 ]
+      IF Len( cWord ) <= 4
+         nPos := At( " " + cWord + " ", Lower( cTextCmd ) )
+      ELSE
+         FOR nCont = Len( cWord ) TO 4 STEP -1
+            cWord := Substr( cWord, 1, nCont )
+            nPos := At( " " + cWord + " ", Lower( cTextCmd ) )
+            IF nPos != 0
+               EXIT
+            ENDIF
+         NEXT
+      ENDIF
+      nPos := iif( nPos == 0, Len( cTextCmd ), nPos )
+      oElement[ 3 ] := nPos
+   NEXT
+   ASort( aParameters, { | oElement | oElement[ 3 ] } )
+   FOR nCont = 1 TO Len( aParameters ) - 1
+      aParameters[ nCont, 4 ] := aParameters[ nCont + 1, 3 ]
+   NEXT
+   aParameters[ 6, 4 ] := Len( cTextCmd )
+   FOR EACH oElement IN aParameters
+      oElement[ 2 ] := AllTrim( Substr( cTextCmd, oElement[ 3 ] + 1, oElement[ 4 ] - oElement[ 3 ] ) )
+      DO CASE
+      CASE oElement[ 1 ] == "for"    ; DBASE_FOR     := Substr( oElement[ 2 ], At( " ", oElement[ 2 ] ) )
+      CASE oElement[ 1 ] == "while"  ; DBASE_WHILE   := Substr( oElement[ 2 ], At( " ", oElement[ 2 ] ) )
+      CASE oElement[ 1 ] == "next"   ; DBASE_NEXT    := Substr( oElement[ 2 ], At( " ", oElement[ 2 ] ) )
+      CASE oElement[ 1 ] == "record" ; DBASE_RECORD  := Substr( oElement[ 2 ], At( " ", oElement[ 2 ] ) )
+      CASE oElement[ 1 ] == "all"    ; DBASE_ALL     := iif( Lower( oElement[ 2 ] ) == "all", .T., .F. )
+      ENDCASE
+   NEXT
+   cTextCmd := AllTrim( Substr( cTextCmd, 1, aParameters[ 1, 3 ] - 1 ) )
+   IF Empty( DBASE_FOR )
+      DBASE_FOR := ".T."
+   ELSEIF MacroType( DBASE_FOR ) != "L"
+      SayScroll( "FOR is not a logical expression" )
+      RETURN .F.
+   ENDIF
+   IF Empty( DBASE_WHILE )
+      DBASE_WHILE := ".T."
+   ELSEIF MacroType( DBASE_WHILE ) != "L"
+      SayScroll( "WHILE is not a logical expression" )
+      RETURN .F.
+   ENDIF
+   IF Empty( DBASE_NEXT )
+      DBASE_NEXT := 0
+   ELSEIF MacroType( DBASE_NEXT ) != "N"
+      SayScroll( "NEXT is not a numeric expression" )
+      RETURN .F.
+   ELSE
+      DBASE_NEXT := &( DBASE_NEXT )
+   ENDIF
+   IF Empty( DBASE_RECORD )
+      DBASE_RECORD := 0
+   ELSEIF MacroType( DBASE_RECORD ) != "N"
+      SayScroll( "RECORD is not a numeric expression" )
+      RETURN .F.
+   ELSE
+      DBASE_RECORD := &( DBASE_RECORD )
+   ENDIF
+   RETURN .T.

@@ -10,37 +10,37 @@ nMenuLevel   := 0
 oMenuOptions := {}
 MenuOption( "General" )
    MenuDrop()
-   MenuOption( "Modal Window", { || ModalWindow() } )
-   MenuOption( "Calendar", { || hb_ThreadStart( { || TwoCalendar() } ) } )
+   MenuOption( "Modal Window",                      { || ModalWindow() } )
+   MenuOption( "Calendar",                          { || hb_ThreadStart( { || TwoCalendar() } ) } )
    IF AppMultiWindow()
-      MenuOption( "Progressbar with time", { || hb_ThreadStart( { || Progressbar() } ) } )
-      MenuOption( "Calculator", { || hb_ThreadStart( { || Calculator() } ) } )
+      MenuOption( "Progressbar with time",          { || hb_ThreadStart( { || Progressbar() } ) } )
+      MenuOption( "Calculator",                     { || hb_ThreadStart( { || Calculator() } ) } )
    ELSE
-      MenuOption( "Progressbar with time", { || Progressbar() } )
-      MenuOption( "Calculator", { || Calculator() } )
+      MenuOption( "Progressbar with time",          { || Progressbar() } )
+      MenuOption( "Calculator",                     { || Calculator() } )
    ENDIF
-   MenuOption( "Generate PDF", { || pdf() } )
-   MenuOption( "dBase like", { || hb_ThreadStart( { || rdbase() } ) } )
+   MenuOption( "Generate PDF",                      { || Pdf() } )
+   MenuOption( "dBase like",                        { || hb_ThreadStart( { || rdbase() } ) } )
    MenuUnDrop()
 MenuOption( "Database" )
    MenuDrop()
    IF AppMultiWindow()
-      MenuOption( "Frm Console Style No Thread", { || frm1( .F., .F. ) } )
-      MenuOption( "Frm WVG Style No Thread", { || frm1( .T., .F. ) } )
-      MenuOption( "Frm Console Thread", { || hb_ThreadStart( { || frm1( .F., .T. ) } ) } )
-      MenuOption( "Frm WVG Style Thread", { || hb_ThreadStart( { || frm1( .T., .T. ) } ) } )
+      MenuOption( "Frm Console Style No Thread",    { || frm1( .F., .F. ) } )
+      MenuOption( "Frm WVG Style No Thread",        { || frm1( .T., .F. ) } )
+      MenuOption( "Frm Console Thread",             { || hb_ThreadStart( { || frm1( .F., .T. ) } ) } )
+      MenuOption( "Frm WVG Style Thread",           { || hb_ThreadStart( { || frm1( .T., .T. ) } ) } )
    ELSE
-      MenuOption( "Frm Console Style", { || frm1( .F., .F. ) } )
+      MenuOption( "Frm Console Style",              { || frm1( .F., .F. ) } )
    ENDIF
    MenuUnDrop()
 MenuOption( "BrazilOnly" )
    MenuDrop()
-   MenuOption( "Consulta Sped", { || hb_ThreadStart( { || ConsultaSped() } ) } )
+   MenuOption( "Consulta Sped",                     { || hb_ThreadStart( { || ConsultaSped() } ) } )
    MenuUnDrop()
 MenuOption( "Menu" )
    MenuDrop()
-   MenuOption( "Use WVG Menu", { || hb_ThreadStart( { || MainMenu( .T. ) } ) } )
-   MenuOption( "About", { || About() } )
+   MenuOption( "Use WVG Menu",                      { || hb_ThreadStart( { || MainMenu( .T. ) } ) } )
+   MenuOption( "About",                             { || About() } )
    MenuUnDrop()
 RETURN oMenuOptions
 *----------------------------------------------------------------
@@ -339,3 +339,4 @@ FUNCTION BuildMenu( oMenu, acMenu )
    NEXT
    RETURN NIL
 #endif
+

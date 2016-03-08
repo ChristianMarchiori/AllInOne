@@ -17,6 +17,7 @@ FUNCTION Frm1( lIsGraphic, lThread )
    ENDIF
    HB_GtInfo( HB_GTI_ICONRES, "AppIcon" )
    HB_GtInfo( HB_GTI_WINTITLE, "Sample Database Class" )
+   SetColor("N/W")
    CreateDbf()
    CLS
    Aadd( oFrm:acMoreOptions, "Browse" )

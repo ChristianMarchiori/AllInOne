@@ -7,7 +7,6 @@ menu.prg
 modalwindow.prg
 pdf.prg
 progressbar.prg
-rdbase.prg
 sped.prg
 ze_frmclass.prg
 ze_frmcadclass.prg
@@ -16,6 +15,7 @@ ze_pdfclass.prg
 ze_errorsys.prg
 ze_sefaz.prg
 ze_xmlfun.prg
+ze_dbase.prg
 test.rc
 hbhpdf.hbc
 hbct.hbc
@@ -27,4 +27,3 @@ gtwvg.hbc
 -compr
 -inc
 -DGTWVG
--workdir=c:\temp
