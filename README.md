@@ -3,7 +3,6 @@
 Group several features
 
 - PDF class
-- Brasilian SPED
 - Calculator
 - Database class
 - dBase like module
@@ -14,3 +13,5 @@ Group several features
 - GTWVG Buttons
 - multithread modules
 - Copy/paste to/from Windows
+
+*Brazilian SPED moved to https://github.com/JoseQuintas/sefazclass
