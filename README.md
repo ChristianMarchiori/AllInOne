@@ -1,8 +1,8 @@
 # AllInOne Harbour + GTWVG
 
-rmchart\    use of rmchart.dll
-errorsys\   my errorsys
-allinone\
+rmchart    use of rmchart.dll
+errorsys   my errorsys
+allinone
 - PDF class
 - Calculator
 - Database class
@@ -14,5 +14,3 @@ allinone\
 - GTWVG Buttons
 - multithread modules
 - Copy/paste to/from Windows
-
-*Brazilian SPED moved to https://github.com/JoseQuintas/sefazclass
