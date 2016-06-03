@@ -1,7 +1,9 @@
 # AllInOne Harbour + GTWVG
 
 rmchart    use of rmchart.dll
-errorsys   my errorsys
+
+errorsys   errorsys with log
+
 allinone
 - PDF class
 - Calculator
