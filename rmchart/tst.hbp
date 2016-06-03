@@ -4,7 +4,6 @@ tstrectangle.prg
 ze_rmchart.prg
 gtwvg.hbc
 hbct.hbc
--workdir=c:\temp
 -w3
 -es2
 -strip

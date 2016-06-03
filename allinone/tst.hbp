@@ -1,4 +1,4 @@
-test.prg
+tst.prg
 about.prg
 calendar.prg
 calculator.prg
@@ -11,9 +11,9 @@ ze_frmclass.prg
 ze_frmcadclass.prg
 ze_functions.prg
 ze_pdfclass.prg
-errorsys\errorsys.prg
+..\errorsys\errorsys.prg
 ze_dbase.prg
-test.rc
+tst.rc
 hbhpdf.hbc
 hbct.hbc
 gtwvg.hbc
