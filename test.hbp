@@ -7,14 +7,11 @@ menu.prg
 modalwindow.prg
 pdf.prg
 progressbar.prg
-sped.prg
 ze_frmclass.prg
 ze_frmcadclass.prg
 ze_functions.prg
 ze_pdfclass.prg
-ze_errorsys.prg
-ze_sefaz.prg
-ze_xmlfun.prg
+errorsys\errorsys.prg
 ze_dbase.prg
 test.rc
 hbhpdf.hbc
