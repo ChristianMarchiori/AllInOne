@@ -1,17 +1,18 @@
 /*
 ze_rmchart - class to use rmchart.dll
 2016.05.15
+
+Caution:
+This class do not have parameters validation.
+If you pass wrong number of parameters, or wrong types to rmchart.dll, you can get a GPF
+Charts not in test may require additional conversion.
+
+Please check rmchart doc about how to use rmchart.dll.
 */
 
 #require hbct.hbc
 #include "hbclass.ch"
 #include "hbdyn.ch"
-
-#define RMC_USERWM         ""               // Your watermark
-#define RMC_USERWMCOLOR    RMC_COLOR_BLACK  // Color for the watermark
-#define RMC_USERWMLUCENT   30               // Lucent factor between 1(=not visible) and 255(=opaque)
-#define RMC_USERWMALIGN    RMC_TEXTCENTER   // Alignment for the watermark
-#define RMC_USERFONTSIZE   0                // Fontsize; if 0: maximal size is used
 
 CREATE CLASS RmChart
 

@@ -1,7 +1,8 @@
 # AllInOne Harbour + GTWVG
 
-Group several features
-
+rmchart\    use of rmchart.dll
+errorsys\   my errorsys
+allinone\
 - PDF class
 - Calculator
 - Database class
