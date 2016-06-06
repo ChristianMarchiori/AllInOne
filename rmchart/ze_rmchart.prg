@@ -1,18 +1,17 @@
 /*
 ze_rmchart - class to use rmchart.dll
 2016.05.15
-
-Caution:
-This class do not have parameters validation.
-If you pass wrong number of parameters, or wrong types to rmchart.dll, you can get a GPF
-Charts not in test may require additional conversion.
-
-Please check rmchart doc about how to use rmchart.dll.
 */
 
 #require hbct.hbc
 #include "hbclass.ch"
 #include "hbdyn.ch"
+
+#define RMC_USERWM         ""               // Your watermark
+#define RMC_USERWMCOLOR    RMC_COLOR_BLACK  // Color for the watermark
+#define RMC_USERWMLUCENT   30               // Lucent factor between 1(=not visible) and 255(=opaque)
+#define RMC_USERWMALIGN    RMC_TEXTCENTER   // Alignment for the watermark
+#define RMC_USERFONTSIZE   0                // Fontsize; if 0: maximal size is used
 
 CREATE CLASS RmChart
 
@@ -25,7 +24,7 @@ CREATE CLASS RmChart
    METHOD AddCaption( ... )                INLINE ::CallDllStd( "RMC_ADDCAPTION", ... )
    METHOD AddDataAxis(a,b,c,d,e, ... )     INLINE ::CallDllStd( "RMC_ADDDATAAXIS", a, b, c, ::ToDecimal(d), ::ToDecimal(e), ... )
    METHOD AddGrid( ... )                   INLINE ::CallDllStd( "RMC_ADDGRID", ... )
-   METHOD AddGridLessSeries(a,b,c,d,e,...) INLINE ::CallDllStd( "RMC_ADDGRIDLESSSERIES", a, b, ::ToDouble(c), d, ::ToSignedLong(e), ... )
+   METHOD AddGridLessSeries(a,b,c,d,e,...) INLINE ::CallDllStd( "RMC_ADDGRIDLESSSERIES", a, b, ::ToDouble(c), d, ::ToLong(e), ... )
    METHOD AddHightLowSeries(a,b,c,...)     INLINE ::CallDllStd( "RMC_ADDHIGHTLOWSERIES", a, b, ::ToDouble(c), ... )
    METHOD AddLabelAxis( ... )              INLINE ::CallDllStd( "RMC_ADDLABELAXIS", ... )
    METHOD AddLegend( ... )                 INLINE ::CallDllStd( "RMC_ADDLEGEND", ... )
@@ -43,13 +42,14 @@ CREATE CLASS RmChart
    METHOD CoDash( ... )                    INLINE ::CallDllStd( "RMC_CODASH", ... )
    METHOD CoDelete( ... )                  INLINE ::CallDllStd( "RMC_CODELETE", ... )
    METHOD CoImage( ... )                   INLINE ::CallDllStd( "RMC_COIMAGE", ... )
-   METHOD CoLine( a, b, c, d, ... )        INLINE ::CallDllStd( "RMC_COLINE", a, b, ::ToSignedLong( c ), ::ToSignedLong( d ), ... )
+   METHOD CoLine( a, b, c, d, ... )        INLINE ::CallDllStd( "RMC_COLINE", a, b, ::ToLong( c ), ::ToLong( d ), ... )
    METHOD CoPolygon( ... )                 INLINE ::CallDllStd( "RMC_COPOLYGON", ... )
    METHOD CoSymbol( ... )                  INLINE ::CallDllStd( "RMC_COSYMBOL", ... )
    METHOD CoText( ... )                    INLINE ::CallDllStd( "RMC_COTEXT", ... )
    METHOD CoVisible( ... )                 INLINE ::CallDllStd( "RMC_COVISIBLE", ... )
    METHOD CreateChart( ... )               INLINE ::CallDllStd( "RMC_CREATECHART", ... )
    /* METHOD CreateChartOnDc( ... )           INLINE ::CallDllStd( "RMC_CREATECHARONDC", ... )  // uncomment if you know what you are doing */
+   METHOD CreateChartFromFile( ... )       INLINE ::CallDllStd( "RMC_CREATECHARFROMFILE", ... )
    METHOD DeleteChart( ... )               INLINE ::CallDllStd( "RMC_DELETECHART", ... )
    METHOD Draw( ... )                      INLINE ::CallDllStd( "RMC_DRAW", ... )
    METHOD Draw2Clipboard( ... )            INLINE ::CallDllStd( "RMC_DRAW2CLIPBOARD", ... )
@@ -74,6 +74,7 @@ CREATE CLASS RmChart
    METHOD Paint( ... )                     INLINE ::CallDllStd( "RMC_PAINT", ... )
    METHOD Reset( ... )                     INLINE ::CallDllStd( "RMC_RESET", ... )
    METHOD Rnd( ... )                       INLINE ::CallDllStd( "RMC_RND", ... )
+   METHOD SaveBMP( ... )                   INLINE ::CallDllStd( "RMC_SAVEBMP", ... )
    METHOD SetCaptionText( ... )            INLINE ::CallDllStd( "RMC_SETCAPTIONTEXT", ... )
    METHOD SetCaptionBGColor( ... )         INLINE ::CallDllStd( "RMC_SETCAPTIONBGCOLOR", ... )
    METHOD SetCaptionTextColor( ... )       INLINE ::CallDllStd( "RMC_SETCAPTIONTEXTCOLOR", ... )
@@ -181,7 +182,7 @@ CREATE CLASS RmChart
    METHOD CallDllStd( cName, ... )         INLINE hb_DynCall( { cName, ::nHandle, HB_DYN_CALLCONV_STDCALL }, ... )
    METHOD ToDecimal( xValue )              INLINE xValue + 1.01 - 1.01
    METHOD ToDouble( xValue )
-   METHOD ToSignedLong( xValue )
+   METHOD ToLong( xValue )
 
    ENDCLASS
 
@@ -201,7 +202,7 @@ METHOD RMChart:ToDouble( xValue )
    ENDCASE
    RETURN cDouble
 
-METHOD RMChart:ToSignedLong( xValue )
+METHOD RMChart:ToLong( xValue )
 
    LOCAL cLong := "", oElement
 

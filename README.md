@@ -2,7 +2,11 @@
 
 rmchart    use of rmchart.dll
 
-errorsys   errorsys with log
+errorsys   errorsys with log for GUI (or console)
+
+gtwvg      controls to gtwvg in test
+
+sefazclass SPED Brazil
 
 allinone
 - PDF class
