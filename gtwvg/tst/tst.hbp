@@ -1,0 +1,15 @@
+tst.prg
+tstrmchart.prg
+tstgtwvg.prg
+errorsys.prg
+d:\cdrom\fontes\integra\ze_rmchart.prg
+d:\cdrom\fontes\integra\ze_wvgtst.prg
+tst.rc
+gtwvg.hbc
+hbct.hbc
+-workdir=c:\temp
+-w3
+-es2
+-Id:\cdrom\fontes\integra
+-strip
+-compr
